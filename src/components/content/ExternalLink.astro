@@ -1,0 +1,40 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = Omit<HTMLAttributes<"a">, "href" | "rel" | "target"> & {
+  href: string;
+  newWindowLabel?: string;
+};
+
+const {
+  href,
+  class: className,
+  newWindowLabel = "Opens in a new tab",
+  ...attributes
+} = Astro.props;
+---
+
+<a
+  {...attributes}
+  class:list={["external-link", className]}
+  href={href}
+  rel="noopener noreferrer"
+  target="_blank"
+>
+  <slot />
+  <span class="external-link__arrow" aria-hidden="true">↗</span>
+  <span class="visually-hidden">({newWindowLabel})</span>
+</a>
+
+<style>
+  .external-link__arrow {
+    display: inline-block;
+    margin-inline-start: 0.18em;
+    color: var(--color-accent);
+    transition: transform 160ms ease;
+  }
+
+  .external-link:hover .external-link__arrow {
+    transform: translate(0.1em, -0.1em);
+  }
+</style>

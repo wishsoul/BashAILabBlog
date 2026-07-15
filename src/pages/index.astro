@@ -1,16 +1,41 @@
 ---
-const faviconUrl = `${import.meta.env.BASE_URL.replace(/\/+$/, "")}/favicon.svg`;
+import { SITE } from "../config/site";
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href={faviconUrl} />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
-  </head>
-  <body>
-    <h1>Astro</h1>
-  </body>
-</html>
+<BaseLayout
+  title={SITE.title}
+  description={SITE.description}
+  lang="en"
+  canonicalPath="/"
+>
+  <section
+    class="site-frame shell-introduction flow"
+    aria-labelledby="site-title"
+  >
+    <p class="meta-label">AI Product Research / Independent Software</p>
+    <h1 id="site-title" class="display-title">{SITE.name}</h1>
+    <p class="lead">{SITE.description}</p>
+  </section>
+</BaseLayout>
+
+<style>
+  .shell-introduction {
+    --flow-space: clamp(1.25rem, 3vw, 2rem);
+    display: grid;
+    align-content: center;
+    min-height: min(76svh, 52rem);
+    padding-block: 5rem;
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .shell-introduction .lead {
+    margin-inline-start: min(12vw, 9rem);
+  }
+
+  @media (max-width: 40rem) {
+    .shell-introduction .lead {
+      margin-inline-start: 0;
+    }
+  }
+</style>
