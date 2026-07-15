@@ -1,0 +1,53 @@
+---
+import type { Locale } from "../../config/site";
+import { getUi } from "../../i18n";
+import { withBase } from "../../lib/urls";
+
+interface Props {
+  lang: Locale;
+  translationPath?: string;
+}
+
+const { lang, translationPath } = Astro.props;
+const ui = getUi(lang);
+const targetLocale: Locale = lang === "en" ? "zh" : "en";
+const fallbackPath = targetLocale === "zh" ? "/zh/" : "/";
+const href = withBase(translationPath ?? fallbackPath);
+const label =
+  targetLocale === "zh"
+    ? ui.language.switchToChinese
+    : ui.language.switchToEnglish;
+const languageName =
+  targetLocale === "zh" ? ui.language.chinese : ui.language.english;
+---
+
+<a
+  class="language-switch"
+  href={href}
+  lang={targetLocale}
+  hreflang={targetLocale}
+  rel="alternate"
+  aria-label={label}
+  title={label}
+>
+  {languageName}
+</a>
+
+<style>
+  .language-switch {
+    display: inline-grid;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    align-items: center;
+    justify-items: center;
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  .language-switch:hover {
+    color: var(--color-text);
+  }
+</style>

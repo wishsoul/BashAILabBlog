@@ -1,0 +1,212 @@
+---
+import type { Locale } from "../../config/site";
+import { NAV_ITEMS, SITE } from "../../config/site";
+import { getUi } from "../../i18n";
+import { withBase } from "../../lib/urls";
+import ExternalLink from "../content/ExternalLink.astro";
+import LanguageSwitch from "./LanguageSwitch.astro";
+import MobileNavigation from "./MobileNavigation.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+
+interface Props {
+  lang: Locale;
+  translationPath?: string;
+}
+
+const { lang, translationPath } = Astro.props;
+const ui = getUi(lang);
+const currentPath = Astro.url.pathname;
+const homePath = withBase("/");
+const isCurrent = (href: string) => {
+  const route = withBase(href);
+  return currentPath === route || currentPath.startsWith(route);
+};
+---
+
+<header class="site-header" data-site-header data-scrolled="false">
+  <div class="site-frame site-header__inner">
+    <a
+      class="site-header__brand"
+      href={homePath}
+      aria-current={currentPath === homePath ? "page" : undefined}
+    >
+      <span class="site-header__brand-mark" aria-hidden="true">B·</span>
+      <span>{SITE.name}</span>
+    </a>
+
+    <nav
+      class="site-header__desktop-navigation"
+      aria-label={ui.header.primaryNavigation}
+    >
+      <ul>
+        {
+          NAV_ITEMS.map((item) => (
+            <li>
+              <a
+                href={withBase(item.href)}
+                aria-current={isCurrent(item.href) ? "page" : undefined}
+              >
+                {ui.nav[item.key]}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <ExternalLink
+            href={SITE.github}
+            newWindowLabel={ui.common.opensNewTab}
+          >
+            {ui.nav.github}
+          </ExternalLink>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="site-header__utilities">
+      <LanguageSwitch lang={lang} translationPath={translationPath} />
+      <ThemeToggle lang={lang} />
+      <MobileNavigation lang={lang} currentPath={currentPath} />
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>("[data-site-header]");
+  let scheduled = false;
+
+  function updateScrollState() {
+    if (header) header.dataset.scrolled = String(window.scrollY > 16);
+    scheduled = false;
+  }
+
+  updateScrollState();
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (scheduled) return;
+      scheduled = true;
+      window.requestAnimationFrame(updateScrollState);
+    },
+    { passive: true },
+  );
+</script>
+
+<style>
+  :global(:root) {
+    --site-header-height: 4.25rem;
+  }
+
+  .site-header {
+    position: fixed;
+    z-index: 50;
+    inset: 0 0 auto;
+    border-block-end: 1px solid transparent;
+    background: transparent;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .site-header[data-scrolled="true"] {
+    border-color: var(--color-border);
+    background: var(--color-background);
+  }
+
+  .site-header__inner {
+    display: flex;
+    height: var(--site-header-height);
+    align-items: center;
+    gap: clamp(1.25rem, 3vw, 3rem);
+  }
+
+  .site-header__brand {
+    display: inline-flex;
+    min-height: 2.5rem;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: var(--font-size-sm);
+    font-weight: 560;
+    letter-spacing: -0.025em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .site-header__brand-mark {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0;
+  }
+
+  .site-header__desktop-navigation {
+    margin-inline-start: auto;
+  }
+
+  .site-header__desktop-navigation ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 2rem);
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    list-style: none;
+  }
+
+  .site-header__desktop-navigation :global(a) {
+    position: relative;
+    display: inline-flex;
+    min-height: 2.5rem;
+    align-items: center;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .site-header__desktop-navigation :global(a:hover) {
+    color: var(--color-text);
+  }
+
+  .site-header__desktop-navigation :global(a[aria-current="page"]) {
+    color: var(--color-text);
+  }
+
+  .site-header__desktop-navigation :global(a[aria-current="page"])::before {
+    position: absolute;
+    top: 50%;
+    left: -0.7rem;
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+    content: "";
+    transform: translateY(-50%);
+  }
+
+  .site-header__utilities {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 47.999rem) {
+    .site-header__inner {
+      gap: 0.75rem;
+    }
+
+    .site-header__brand {
+      margin-inline-end: auto;
+    }
+
+    .site-header__brand-mark {
+      display: none;
+    }
+
+    .site-header__desktop-navigation {
+      display: none;
+    }
+
+    .site-header__utilities {
+      gap: 0.5rem;
+    }
+  }
+</style>

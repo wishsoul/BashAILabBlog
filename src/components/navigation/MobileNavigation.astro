@@ -1,0 +1,234 @@
+---
+import type { Locale } from "../../config/site";
+import { NAV_ITEMS, SITE } from "../../config/site";
+import { getUi } from "../../i18n";
+import { withBase } from "../../lib/urls";
+import ExternalLink from "../content/ExternalLink.astro";
+
+interface Props {
+  lang: Locale;
+  currentPath: string;
+}
+
+const { lang, currentPath } = Astro.props;
+const ui = getUi(lang);
+const isCurrent = (href: string) => {
+  const route = withBase(href);
+  return currentPath === route || currentPath.startsWith(route);
+};
+---
+
+<div class="mobile-navigation" data-mobile-navigation>
+  <button
+    class="mobile-navigation__trigger"
+    type="button"
+    aria-expanded="false"
+    aria-controls="site-mobile-navigation"
+    aria-label={ui.header.menu}
+    data-mobile-navigation-trigger
+    data-menu-label={ui.header.menu}
+    data-close-label={ui.header.closeMenu}
+  >
+    <span data-mobile-navigation-label>{ui.header.menu}</span>
+    <span class="mobile-navigation__indicator" aria-hidden="true"></span>
+  </button>
+
+  <div
+    id="site-mobile-navigation"
+    class="mobile-navigation__panel"
+    data-mobile-navigation-panel
+    hidden
+  >
+    <nav aria-label={ui.header.mobileNavigation}>
+      <ul class="site-frame mobile-navigation__list">
+        {
+          NAV_ITEMS.map((item, index) => (
+            <li>
+              <span class="mobile-navigation__index" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <a
+                href={withBase(item.href)}
+                aria-current={isCurrent(item.href) ? "page" : undefined}
+              >
+                {ui.nav[item.key]}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <span class="mobile-navigation__index" aria-hidden="true">05</span>
+          <ExternalLink
+            href={SITE.github}
+            newWindowLabel={ui.common.opensNewTab}
+          >
+            {ui.nav.github}
+          </ExternalLink>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<script>
+  const navigation = document.querySelector<HTMLElement>(
+    "[data-mobile-navigation]",
+  );
+  const trigger = navigation?.querySelector<HTMLButtonElement>(
+    "[data-mobile-navigation-trigger]",
+  );
+  const panel = navigation?.querySelector<HTMLElement>(
+    "[data-mobile-navigation-panel]",
+  );
+  const visibleLabel = navigation?.querySelector<HTMLElement>(
+    "[data-mobile-navigation-label]",
+  );
+
+  function setOpen(open: boolean, restoreFocus = false) {
+    if (!trigger || !panel || !visibleLabel) return;
+
+    const label = open ? trigger.dataset.closeLabel : trigger.dataset.menuLabel;
+    trigger.setAttribute("aria-expanded", String(open));
+    panel.hidden = !open;
+
+    if (label) {
+      trigger.setAttribute("aria-label", label);
+      visibleLabel.textContent = label;
+    }
+
+    if (!open && restoreFocus) trigger.focus();
+  }
+
+  trigger?.addEventListener("click", () => {
+    setOpen(trigger.getAttribute("aria-expanded") !== "true");
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (
+      event.key !== "Escape" ||
+      trigger?.getAttribute("aria-expanded") !== "true"
+    )
+      return;
+    setOpen(false, true);
+  });
+
+  panel?.addEventListener("click", (event) => {
+    if ((event.target as Element).closest("a")) setOpen(false);
+  });
+
+  window
+    .matchMedia("(min-width: 48rem)")
+    .addEventListener("change", (event) => {
+      if (event.matches) setOpen(false);
+    });
+</script>
+
+<style>
+  .mobile-navigation {
+    display: none;
+  }
+
+  @media (max-width: 47.999rem) {
+    .mobile-navigation {
+      display: block;
+    }
+
+    .mobile-navigation__trigger {
+      display: inline-flex;
+      min-height: 2.5rem;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      letter-spacing: 0.04em;
+    }
+
+    .mobile-navigation__trigger:hover {
+      color: var(--color-text);
+    }
+
+    .mobile-navigation__indicator {
+      position: relative;
+      width: 0.75rem;
+      height: 0.75rem;
+    }
+
+    .mobile-navigation__indicator::before,
+    .mobile-navigation__indicator::after {
+      position: absolute;
+      inset: 50% 0 auto;
+      height: 1px;
+      background: currentColor;
+      content: "";
+      transition: transform 160ms ease;
+    }
+
+    .mobile-navigation__indicator::after {
+      transform: rotate(90deg);
+    }
+
+    .mobile-navigation__trigger[aria-expanded="true"]
+      .mobile-navigation__indicator::before {
+      transform: rotate(45deg);
+    }
+
+    .mobile-navigation__trigger[aria-expanded="true"]
+      .mobile-navigation__indicator::after {
+      transform: rotate(-45deg);
+    }
+
+    .mobile-navigation__panel {
+      position: fixed;
+      z-index: 49;
+      inset: var(--site-header-height) 0 auto;
+      border-block: 1px solid var(--color-border);
+      background: var(--color-background);
+    }
+
+    .mobile-navigation__panel[hidden] {
+      display: none;
+    }
+
+    .mobile-navigation__list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding-block: 1rem 1.5rem;
+      list-style: none;
+    }
+
+    .mobile-navigation__list li {
+      display: grid;
+      grid-template-columns: 2rem minmax(0, 1fr);
+      align-items: baseline;
+      padding-block: 0.85rem;
+      border-block-end: 1px solid var(--color-border);
+    }
+
+    .mobile-navigation__list li:nth-child(odd) {
+      margin-inline-end: 1rem;
+    }
+
+    .mobile-navigation__index {
+      color: var(--color-text-secondary);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+    }
+
+    .mobile-navigation__list :global(a) {
+      display: inline-flex;
+      min-height: 2.5rem;
+      align-items: center;
+      font-size: var(--font-size-sm);
+      text-decoration: none;
+    }
+
+    .mobile-navigation__list :global(a[aria-current="page"]) {
+      color: var(--color-accent);
+    }
+  }
+</style>

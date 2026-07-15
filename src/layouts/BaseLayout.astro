@@ -4,6 +4,7 @@ import "@fontsource-variable/geist-mono/index.css";
 import type { Locale } from "../config/site";
 import { SITE } from "../config/site";
 import SiteFooter from "../components/layout/SiteFooter.astro";
+import SiteHeader from "../components/navigation/SiteHeader.astro";
 import { absoluteUrl, withBase } from "../lib/urls";
 import "../styles/global.css";
 
@@ -16,9 +17,18 @@ export interface Props {
   canonicalPath: string;
   image?: string;
   jsonLd?: JsonLd;
+  translationPath?: string;
 }
 
-const { title, description, lang, canonicalPath, image, jsonLd } = Astro.props;
+const {
+  title,
+  description,
+  lang,
+  canonicalPath,
+  image,
+  jsonLd,
+  translationPath,
+} = Astro.props;
 const pageTitle = title.includes(SITE.name) ? title : `${title} — ${SITE.name}`;
 const canonicalUrl = absoluteUrl(canonicalPath);
 const socialImageUrl = image ? absoluteUrl(image) : undefined;
@@ -89,9 +99,16 @@ const serializedJsonLd = jsonLd
     </script>
   </head>
   <body>
+    <SiteHeader lang={lang} translationPath={translationPath} />
     <main id="main-content">
       <slot />
     </main>
     <SiteFooter lang={lang} />
   </body>
 </html>
+
+<style>
+  main {
+    padding-block-start: var(--site-header-height);
+  }
+</style>
