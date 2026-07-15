@@ -1,7 +1,13 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
+const percentageClaimPattern = /\b\d+(?:\.\d+)?%/u;
+
 describe("launch content files", () => {
+  it("detects ordinary percentage claims", () => {
+    expect("95% improvement").toMatch(percentageClaimPattern);
+  });
+
   it("contains only the approved honest Work profiles", () => {
     const files = readdirSync(
       new URL("../../src/content/work/en/", import.meta.url),
@@ -20,10 +26,57 @@ describe("launch content files", () => {
         "utf8",
       );
 
-      expect(source).toContain("lang: en");
-      expect(source).toContain("draft: false");
+      expect(source).toMatch(/^lang: en$/mu);
+      expect(source).toMatch(/^draft: false$/mu);
+      expect(source).toMatch(/^year: null$/mu);
+      expect(source).toMatch(/^startedAt: null$/mu);
+      expect(source).toMatch(
+        file === "mac-native-kit.mdx"
+          ? /^role: Product strategy, system design, and implementation$/mu
+          : /^role: Role details not yet supplied$/mu,
+      );
       expect(source).not.toMatch(/^cover:/mu);
-      expect(source).not.toMatch(/\b\d+(?:\.\d+)?%\b/u);
+      expect(source).not.toMatch(percentageClaimPattern);
+
+      if (file !== "mac-native-kit.mdx") {
+        expect(source).toMatch(
+          /^## My Role\n\nRole details not yet supplied$/mu,
+        );
+      }
+    }
+  });
+
+  it("keeps undated Research drafts isolated from published articles", () => {
+    const draftFiles = [
+      "github-issues-source-of-truth.mdx",
+      "human-checkpoints-autonomous-development.mdx",
+    ];
+    const publishedFiles = [
+      "designing-constraint-system-ai-ui.mdx",
+      "from-l3-to-l4-agentic-development.mdx",
+      "why-functional-tests-fail-user-journeys.mdx",
+    ];
+
+    for (const file of draftFiles) {
+      const source = readFileSync(
+        new URL(`../../src/content/research/en/${file}`, import.meta.url),
+        "utf8",
+      );
+
+      expect(source).toMatch(/^draft: true$/mu);
+      expect(source).toMatch(/^publishedAt: null$/mu);
+    }
+
+    for (const file of publishedFiles) {
+      const source = readFileSync(
+        new URL(`../../src/content/research/en/${file}`, import.meta.url),
+        "utf8",
+      );
+
+      expect(source).toMatch(/^draft: false$/mu);
+      expect(source).toMatch(/^publishedAt: \d{4}-\d{2}-\d{2}$/mu);
+      expect(source).not.toMatch(/^draft: true$/mu);
+      expect(source).not.toMatch(/^publishedAt: null$/mu);
     }
   });
 });
