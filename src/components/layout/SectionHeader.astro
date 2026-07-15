@@ -1,0 +1,54 @@
+---
+interface Props {
+  id: string;
+  index: string;
+  title: string;
+  label: string;
+}
+
+const { id, index, title, label } = Astro.props;
+---
+
+<header class="section-header">
+  <p class="section-header__label meta-label">
+    <span>{index}</span>
+    <span>{label}</span>
+  </p>
+  <h2 id={id}>{title}</h2>
+</header>
+
+<style>
+  .section-header {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.45fr) minmax(0, 1fr);
+    align-items: end;
+    gap: 2rem;
+    padding-block-end: clamp(2rem, 5vw, 3.5rem);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .section-header__label {
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+  }
+
+  .section-header__label span:first-child {
+    color: var(--color-accent);
+  }
+
+  .section-header h2 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 540;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+  }
+
+  @media (max-width: 39.999rem) {
+    .section-header {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+  }
+</style>

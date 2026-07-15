@@ -1,0 +1,191 @@
+---
+import { withBase } from "../../lib/urls";
+
+interface Props {
+  exploreWorkLabel: string;
+  readResearchLabel: string;
+}
+
+const { exploreWorkLabel, readResearchLabel } = Astro.props;
+const focusAreas = [
+  "AI Product Research",
+  "Agentic Development",
+  "Native Software",
+  "Independent Products",
+];
+---
+
+<section
+  class="hero site-frame"
+  data-home-section="hero"
+  aria-labelledby="home-title"
+>
+  <div class="hero__heading flow">
+    <p class="meta-label">Bash AI Lab / Independent Research Practice</p>
+    <h1 id="home-title" class="display-title">
+      Building systems that help<br />
+      one person create software<br />
+      with AI.
+    </h1>
+  </div>
+
+  <div class="hero__context">
+    <p class="hero__lead lead" data-hero-lead>
+      I research how AI agents, product systems, and constrained interfaces turn
+      ideas into production-ready software.
+    </p>
+
+    <ul class="hero__focus" aria-label="Research areas">
+      {
+        focusAreas.map((area, index) => (
+          <li>
+            <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+            {area}
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="hero__footer">
+      <p class="meta-label">Based in Shenzhen / Working globally</p>
+      <nav class="hero__actions" aria-label="Homepage introduction">
+        <a href={withBase("/work/")}>
+          {exploreWorkLabel}<span aria-hidden="true">↗</span>
+        </a>
+        <a href={withBase("/research/")}>
+          {readResearchLabel}<span aria-hidden="true">↗</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    min-height: min(54rem, max(34rem, calc(86svh - var(--site-header-height))));
+    align-content: space-between;
+    padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 7vw, 5rem);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .hero__heading {
+    --flow-space: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .hero h1 {
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+
+  .hero__context {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr);
+    gap: clamp(2rem, 6vw, 7rem);
+    margin-block-start: clamp(4rem, 8vw, 8rem);
+    margin-inline-start: min(11vw, 9rem);
+  }
+
+  .hero__lead {
+    margin: 0;
+  }
+
+  .hero__focus {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1.5rem;
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+    list-style: none;
+  }
+
+  .hero__focus li {
+    display: grid;
+    grid-template-columns: 1.8rem minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+
+  .hero__focus span {
+    color: var(--color-accent);
+  }
+
+  .hero__footer {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: end;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-block-start: clamp(1.75rem, 4vw, 3rem);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .hero__footer p {
+    margin: 0;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 1rem 2rem;
+  }
+
+  .hero__actions a {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.65rem;
+    border-block-end: 1px solid var(--color-border);
+    font-size: var(--font-size-sm);
+    font-weight: 520;
+    text-decoration: none;
+    transition: border-color 160ms ease;
+  }
+
+  .hero__actions a:hover {
+    border-color: var(--color-accent);
+  }
+
+  .hero__actions span {
+    color: var(--color-accent);
+    transition: transform 160ms ease;
+  }
+
+  .hero__actions a:hover span {
+    transform: translate(0.15rem, -0.15rem);
+  }
+
+  @media (max-width: 47.999rem) {
+    .hero {
+      min-height: min(
+        48rem,
+        max(36rem, calc(88svh - var(--site-header-height)))
+      );
+      padding-block-start: 3.5rem;
+    }
+
+    .hero__context {
+      grid-template-columns: 1fr;
+      margin-block-start: 4rem;
+      margin-inline-start: 0;
+    }
+
+    .hero__footer {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .hero__actions {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 25rem) {
+    .hero__focus {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

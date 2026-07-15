@@ -1,0 +1,106 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { contentSlug } from "../../lib/content";
+import { withBase } from "../../lib/urls";
+
+interface Props {
+  entries: CollectionEntry<"research">[];
+}
+
+const { entries } = Astro.props;
+---
+
+<ol class="research-index">
+  {
+    entries.map((entry, index) => (
+      <li data-content-id={entry.id}>
+        <a href={withBase(`/research/${contentSlug(entry.id)}/`)}>
+          <span class="research-index__number" aria-hidden="true">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span class="research-index__content">
+            <span class="research-index__title" data-research-theme-title>
+              {entry.data.title}
+            </span>
+            <span class="research-index__description">
+              {entry.data.description}
+            </span>
+          </span>
+          <span class="research-index__arrow" aria-hidden="true">
+            ↗
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .research-index {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .research-index li {
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .research-index a {
+    display: grid;
+    grid-template-columns: minmax(3.5rem, 0.22fr) minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 1.5rem;
+    padding-block: clamp(1.75rem, 4vw, 3rem);
+    text-decoration: none;
+  }
+
+  .research-index__number {
+    padding-block-start: 0.35rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+  }
+
+  .research-index__content {
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.8fr) minmax(15rem, 1.2fr);
+    gap: clamp(1.5rem, 5vw, 5rem);
+  }
+
+  .research-index__title {
+    font-size: var(--font-size-lg);
+    font-weight: 540;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+  }
+
+  .research-index__description {
+    max-width: 38rem;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+  }
+
+  .research-index__arrow {
+    color: var(--color-accent);
+    font-size: var(--font-size-sm);
+    transition: transform 160ms ease;
+  }
+
+  .research-index a:hover .research-index__arrow {
+    transform: translate(0.15rem, -0.15rem);
+  }
+
+  @media (max-width: 47.999rem) {
+    .research-index a {
+      grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+      gap: 0.75rem;
+    }
+
+    .research-index__content {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+</style>

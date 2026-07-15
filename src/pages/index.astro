@@ -1,6 +1,38 @@
 ---
+import { getCollection } from "astro:content";
+import ArticleListItem from "../components/content/ArticleListItem.astro";
+import ResearchIndex from "../components/content/ResearchIndex.astro";
+import HeroSection from "../components/layout/HeroSection.astro";
+import SectionHeader from "../components/layout/SectionHeader.astro";
+import LabStatus from "../components/work/LabStatus.astro";
+import ProjectFeature from "../components/work/ProjectFeature.astro";
 import { SITE } from "../config/site";
+import { getUi } from "../i18n";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const ui = getUi("en");
+const [allWork, allResearch] = await Promise.all([
+  getCollection("work"),
+  getCollection("research"),
+]);
+
+const visibleWork = allWork
+  .filter((entry) => entry.data.lang === "en" && !entry.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+const selectedWork = visibleWork.filter((entry) => entry.data.featured);
+const visibleResearch = allResearch.filter(
+  (entry) => entry.data.lang === "en" && !entry.data.draft,
+);
+const researchThemes = visibleResearch
+  .filter((entry) => entry.data.kind === "theme" && entry.data.featured)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, "en"));
+const latestResearch = visibleResearch
+  .filter((entry) => entry.data.kind === "article" && entry.data.publishedAt)
+  .sort(
+    (a, b) =>
+      (b.data.publishedAt?.getTime() ?? 0) -
+      (a.data.publishedAt?.getTime() ?? 0),
+  );
 ---
 
 <BaseLayout
@@ -9,33 +41,100 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   lang="en"
   canonicalPath="/"
 >
+  <HeroSection
+    exploreWorkLabel={ui.cta.exploreWork}
+    readResearchLabel={ui.cta.readResearch}
+  />
+
   <section
-    class="site-frame shell-introduction flow"
-    aria-labelledby="site-title"
+    class="home-section site-frame"
+    data-home-section="current-research"
+    aria-labelledby="current-research-title"
   >
-    <p class="meta-label">AI Product Research / Independent Software</p>
-    <h1 id="site-title" class="display-title">{SITE.name}</h1>
-    <p class="lead">{SITE.description}</p>
+    <SectionHeader
+      id="current-research-title"
+      index="01"
+      label="Research Index"
+      title="Current Research"
+    />
+    <ResearchIndex entries={researchThemes} />
+  </section>
+
+  <section
+    class="home-section home-section--work site-frame"
+    data-home-section="selected-work"
+    aria-labelledby="selected-work-title"
+  >
+    <SectionHeader
+      id="selected-work-title"
+      index="02"
+      label="Project Profiles"
+      title="Selected Work"
+    />
+    <div class="selected-work">
+      {
+        selectedWork.map((entry, index) => (
+          <ProjectFeature
+            entry={entry}
+            index={index}
+            linkLabel={ui.cta.viewProject}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <section
+    class="home-section site-frame"
+    data-home-section="latest-research"
+    aria-labelledby="latest-research-title"
+  >
+    <SectionHeader
+      id="latest-research-title"
+      index="03"
+      label="Publications"
+      title="Latest Research"
+    />
+    <ol class="latest-research">
+      {latestResearch.map((entry) => <ArticleListItem entry={entry} />)}
+    </ol>
+  </section>
+
+  <section
+    class="home-section home-section--status site-frame"
+    data-home-section="lab-status"
+    aria-labelledby="lab-status-title"
+  >
+    <SectionHeader
+      id="lab-status-title"
+      index="04"
+      label="Now Building"
+      title="Lab Status"
+    />
+    <LabStatus entries={visibleWork} />
   </section>
 </BaseLayout>
 
 <style>
-  .shell-introduction {
-    --flow-space: clamp(1.25rem, 3vw, 2rem);
-    display: grid;
-    align-content: center;
-    min-height: min(76svh, 52rem);
-    padding-block: 5rem;
-    border-block-end: 1px solid var(--color-border);
+  .home-section {
+    padding-block-start: clamp(5rem, 12vw, 10rem);
   }
 
-  .shell-introduction .lead {
-    margin-inline-start: min(12vw, 9rem);
+  .home-section--work {
+    width: min(100% - (2 * var(--page-gutter)), 92rem);
   }
 
-  @media (max-width: 40rem) {
-    .shell-introduction .lead {
-      margin-inline-start: 0;
-    }
+  .latest-research {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .home-section--status {
+    padding-block-end: clamp(1rem, 3vw, 2rem);
+  }
+
+  .home-section--status :global(.section-header) {
+    margin-block-end: clamp(2rem, 5vw, 3.5rem);
   }
 </style>

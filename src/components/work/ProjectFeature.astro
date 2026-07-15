@@ -1,0 +1,268 @@
+---
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+import { contentSlug } from "../../lib/content";
+import { withBase } from "../../lib/urls";
+import TagList from "../content/TagList.astro";
+import StatusIndicator from "./StatusIndicator.astro";
+
+interface Props {
+  entry: CollectionEntry<"work">;
+  index: number;
+  linkLabel: string;
+}
+
+const { entry, index, linkLabel } = Astro.props;
+const number = String(index + 1).padStart(2, "0");
+const isReversed = index % 2 === 1;
+const href = withBase(`/work/${contentSlug(entry.id)}/`);
+---
+
+<article
+  class:list={["project-feature", { "project-feature--reversed": isReversed }]}
+  data-project-feature
+  data-content-id={entry.id}
+>
+  <div class="project-feature__content">
+    <div class="project-feature__heading">
+      <p class="project-feature__number meta-label">{number} / Featured Work</p>
+      <StatusIndicator status={entry.data.status} />
+    </div>
+
+    <div class="project-feature__title flow">
+      <p class="meta-label">{entry.data.category} / {entry.data.platform}</p>
+      <h3 data-project-title>{entry.data.title}</h3>
+      <p>{entry.data.description}</p>
+    </div>
+
+    <TagList tags={entry.data.tags} label={`${entry.data.title} tags`} />
+
+    <a class="project-feature__link" href={href}>
+      {linkLabel}<span aria-hidden="true">↗</span>
+    </a>
+  </div>
+
+  <div class="project-feature__visual">
+    {
+      entry.data.cover ? (
+        <Image
+          class="project-feature__image"
+          src={entry.data.cover}
+          alt=""
+          widths={[480, 720, 960]}
+          sizes="(max-width: 768px) 100vw, 54vw"
+        />
+      ) : (
+        <div class="project-cover" data-typographic-cover aria-hidden="true">
+          <div class="project-cover__topline">
+            <span>{number}</span>
+            <span>{entry.data.status}</span>
+          </div>
+          <p>{entry.data.category}</p>
+          <strong>{entry.data.title}</strong>
+          <div class="project-cover__baseline">
+            <span>{entry.data.platform}</span>
+            <span>Bash AI Lab</span>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .project-feature {
+    display: grid;
+    grid-template-areas: "content visual";
+    grid-template-columns: minmax(18rem, 0.76fr) minmax(24rem, 1.24fr);
+    gap: clamp(2rem, 7vw, 7rem);
+    padding-block: clamp(3rem, 8vw, 7rem);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .project-feature--reversed {
+    grid-template-areas: "visual content";
+    grid-template-columns: minmax(24rem, 1.24fr) minmax(18rem, 0.76fr);
+  }
+
+  .project-feature__content {
+    display: grid;
+    grid-area: content;
+    align-content: center;
+    gap: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  .project-feature__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-end: 1rem;
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .project-feature__number {
+    margin: 0;
+  }
+
+  .project-feature__title {
+    --flow-space: 1rem;
+  }
+
+  .project-feature__title h3 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 540;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+  }
+
+  .project-feature__title > p:last-child {
+    max-width: 34rem;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  .project-feature__link {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.75rem;
+    border-block-end: 1px solid var(--color-border);
+    font-size: var(--font-size-sm);
+    font-weight: 520;
+    text-decoration: none;
+  }
+
+  .project-feature__link span {
+    color: var(--color-accent);
+    transition: transform 160ms ease;
+  }
+
+  .project-feature__link:hover span {
+    transform: translate(0.15rem, -0.15rem);
+  }
+
+  .project-feature__visual {
+    min-width: 0;
+    grid-area: visual;
+  }
+
+  .project-feature__image,
+  .project-cover {
+    width: 100%;
+    min-height: clamp(24rem, 48vw, 40rem);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .project-feature__image {
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .project-cover {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    align-content: space-between;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    isolation: isolate;
+  }
+
+  .project-cover::before,
+  .project-cover::after {
+    position: absolute;
+    z-index: -1;
+    content: "";
+  }
+
+  .project-cover::before {
+    inset: 18% -12% auto 46%;
+    height: 1px;
+    background: var(--color-accent);
+    transform: rotate(-34deg);
+    transform-origin: left;
+  }
+
+  .project-cover::after {
+    right: clamp(1.5rem, 4vw, 3rem);
+    bottom: clamp(1.5rem, 4vw, 3rem);
+    width: clamp(2.5rem, 7vw, 5rem);
+    aspect-ratio: 1;
+    border: 1px solid var(--color-accent);
+    border-radius: 50%;
+  }
+
+  .project-cover__topline,
+  .project-cover__baseline {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .project-cover > p {
+    align-self: end;
+    margin: auto 0 1rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .project-cover strong {
+    max-width: 10ch;
+    margin-block-end: auto;
+    overflow-wrap: anywhere;
+    font-size: clamp(var(--font-size-xl), 6vw, 4.75rem);
+    font-weight: 520;
+    letter-spacing: -0.065em;
+    line-height: 0.92;
+  }
+
+  .project-cover__baseline {
+    align-items: end;
+    padding-block-start: 2rem;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .project-cover__baseline span:last-child {
+    margin-inline-end: clamp(3.25rem, 8vw, 6rem);
+  }
+
+  @media (max-width: 63.999rem) {
+    .project-feature,
+    .project-feature--reversed {
+      grid-template-areas:
+        "content"
+        "visual";
+      grid-template-columns: 1fr;
+    }
+
+    .project-feature__content {
+      max-width: 44rem;
+    }
+
+    .project-feature__image,
+    .project-cover {
+      min-height: clamp(20rem, 76vw, 36rem);
+    }
+  }
+
+  @media (max-width: 31.999rem) {
+    .project-feature__heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .project-cover {
+      min-height: 20rem;
+    }
+  }
+</style>
