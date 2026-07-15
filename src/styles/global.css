@@ -71,7 +71,8 @@ a {
 }
 
 a:hover {
-  color: var(--color-accent);
+  color: inherit;
+  text-decoration-line: underline;
 }
 
 button,
