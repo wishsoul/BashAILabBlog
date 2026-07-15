@@ -9,3 +9,9 @@ test-results/
 .env.*
 !.env.example
 .DS_Store
+.tmp/
+coverage/
+*.log
+
+# jetbrains setting folder
+.idea/
