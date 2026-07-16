@@ -1,13 +1,19 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { contentSlug, estimateReadingMinutes } from "../../lib/content";
+import type { Locale } from "../../config/site";
+import { getUi } from "../../i18n";
+import { estimateReadingMinutes } from "../../lib/content";
+import { displayContentLabel } from "../../lib/content-labels";
+import { contentPath } from "../../lib/localized-content";
 import { withBase } from "../../lib/urls";
 
 interface Props {
   entry: CollectionEntry<"research">;
+  locale?: Locale;
 }
 
-const { entry } = Astro.props;
+const { entry, locale = entry.data.lang } = Astro.props;
+const ui = getUi(locale);
 const publishedAt = entry.data.publishedAt;
 const sourceText =
   "body" in entry && typeof entry.body === "string"
@@ -15,13 +21,24 @@ const sourceText =
     : entry.data.description;
 const readingMinutes =
   entry.data.readingMinutes ?? estimateReadingMinutes(sourceText);
-const dateLabel = publishedAt
+const englishDateLabel = publishedAt
   ? [
       publishedAt.getUTCFullYear(),
       String(publishedAt.getUTCMonth() + 1).padStart(2, "0"),
       String(publishedAt.getUTCDate()).padStart(2, "0"),
     ].join(".")
   : "";
+const dateLabel = publishedAt
+  ? locale === "zh"
+    ? new Intl.DateTimeFormat("zh-CN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(publishedAt)
+    : englishDateLabel
+  : "";
+const href = withBase(contentPath(locale, "research", entry.id));
 ---
 
 <li class="article-item" data-content-id={entry.id} data-research-article>
@@ -35,12 +52,12 @@ const dateLabel = publishedAt
     }
     <div class="article-item__body">
       <p class="article-item__meta meta-label">
-        <span>{entry.data.category}</span>
-        <span>{entry.data.status}</span>
-        <span>{readingMinutes} min read</span>
+        <span>{displayContentLabel(locale, entry.data.category)}</span>
+        <span>{displayContentLabel(locale, entry.data.status)}</span>
+        <span>{readingMinutes} {ui.metadata.minutesRead}</span>
       </p>
       <h3>
-        <a href={withBase(`/research/${contentSlug(entry.id)}/`)}>
+        <a href={href}>
           <span data-article-title>{entry.data.title}</span>
           <span class="article-item__arrow" aria-hidden="true">↗</span>
         </a>

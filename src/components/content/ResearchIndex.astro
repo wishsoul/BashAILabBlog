@@ -1,37 +1,42 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { contentSlug } from "../../lib/content";
+import type { Locale } from "../../config/site";
+import { contentPath } from "../../lib/localized-content";
 import { withBase } from "../../lib/urls";
 
 interface Props {
   entries: CollectionEntry<"research">[];
+  locale?: Locale;
 }
 
-const { entries } = Astro.props;
+const { entries, locale = entries[0]?.data.lang ?? "en" } = Astro.props;
 ---
 
 <ol class="research-index">
   {
-    entries.map((entry, index) => (
-      <li data-content-id={entry.id}>
-        <a href={withBase(`/research/${contentSlug(entry.id)}/`)}>
-          <span class="research-index__number" aria-hidden="true">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span class="research-index__content">
-            <span class="research-index__title" data-research-theme-title>
-              {entry.data.title}
+    entries.map((entry, index) => {
+      const href = withBase(contentPath(locale, "research", entry.id));
+      return (
+        <li data-content-id={entry.id}>
+          <a href={href}>
+            <span class="research-index__number" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")}
             </span>
-            <span class="research-index__description">
-              {entry.data.description}
+            <span class="research-index__content">
+              <span class="research-index__title" data-research-theme-title>
+                {entry.data.title}
+              </span>
+              <span class="research-index__description">
+                {entry.data.description}
+              </span>
             </span>
-          </span>
-          <span class="research-index__arrow" aria-hidden="true">
-            ↗
-          </span>
-        </a>
-      </li>
-    ))
+            <span class="research-index__arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        </li>
+      );
+    })
   }
 </ol>
 

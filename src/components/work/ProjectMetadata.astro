@@ -1,39 +1,47 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import type { Locale } from "../../config/site";
+import { getUi } from "../../i18n";
+import { displayContentLabel } from "../../lib/content-labels";
 import StatusIndicator from "./StatusIndicator.astro";
 
 interface Props {
   entry: CollectionEntry<"work">;
+  locale?: Locale;
 }
 
-const { entry } = Astro.props;
-const startedAt = entry.data.startedAt?.toLocaleDateString("en", {
-  year: "numeric",
-  month: "long",
-});
+const { entry, locale = entry.data.lang } = Astro.props;
+const ui = getUi(locale);
+const startedAt = entry.data.startedAt?.toLocaleDateString(
+  locale === "zh" ? "zh-CN" : "en",
+  {
+    year: "numeric",
+    month: "long",
+  },
+);
 ---
 
 <dl class="project-metadata" data-project-metadata>
   <div>
-    <dt>Status</dt>
-    <dd><StatusIndicator status={entry.data.status} /></dd>
+    <dt>{ui.metadata.status}</dt>
+    <dd><StatusIndicator status={entry.data.status} locale={locale} /></dd>
   </div>
   <div>
-    <dt>Category</dt>
-    <dd>{entry.data.category}</dd>
+    <dt>{ui.metadata.category}</dt>
+    <dd>{displayContentLabel(locale, entry.data.category)}</dd>
   </div>
   <div>
-    <dt>Platform</dt>
+    <dt>{ui.metadata.platform}</dt>
     <dd>{entry.data.platform}</dd>
   </div>
   <div class="project-metadata__role">
-    <dt>Role</dt>
+    <dt>{ui.metadata.role}</dt>
     <dd>{entry.data.role}</dd>
   </div>
   {
     entry.data.year !== null && (
       <div>
-        <dt>Year</dt>
+        <dt>{ui.metadata.year}</dt>
         <dd>{entry.data.year}</dd>
       </div>
     )
@@ -41,7 +49,7 @@ const startedAt = entry.data.startedAt?.toLocaleDateString("en", {
   {
     startedAt && (
       <div>
-        <dt>Started</dt>
+        <dt>{ui.metadata.started}</dt>
         <dd>{startedAt}</dd>
       </div>
     )

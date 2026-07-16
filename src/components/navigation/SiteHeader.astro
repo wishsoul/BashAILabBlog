@@ -2,6 +2,7 @@
 import type { Locale } from "../../config/site";
 import { NAV_ITEMS, SITE } from "../../config/site";
 import { getUi } from "../../i18n";
+import { localizedPath } from "../../lib/localized-content";
 import { withBase } from "../../lib/urls";
 import ExternalLink from "../content/ExternalLink.astro";
 import LanguageSwitch from "./LanguageSwitch.astro";
@@ -16,7 +17,7 @@ interface Props {
 const { lang, translationPath } = Astro.props;
 const ui = getUi(lang);
 const currentPath = Astro.url.pathname;
-const homePath = withBase("/");
+const homePath = withBase(localizedPath(lang, "/"));
 const isCurrent = (href: string) => {
   const route = withBase(href);
   return currentPath === route || currentPath.startsWith(route);
@@ -31,7 +32,7 @@ const isCurrent = (href: string) => {
       aria-current={currentPath === homePath ? "page" : undefined}
     >
       <span class="site-header__brand-mark" aria-hidden="true">B·</span>
-      <span>{SITE.name}</span>
+      <span>{ui.brand}</span>
     </a>
 
     <nav
@@ -40,16 +41,19 @@ const isCurrent = (href: string) => {
     >
       <ul>
         {
-          NAV_ITEMS.map((item) => (
-            <li>
-              <a
-                href={withBase(item.href)}
-                aria-current={isCurrent(item.href) ? "page" : undefined}
-              >
-                {ui.nav[item.key]}
-              </a>
-            </li>
-          ))
+          NAV_ITEMS.map((item) => {
+            const href = localizedPath(lang, item.href);
+            return (
+              <li>
+                <a
+                  href={withBase(href)}
+                  aria-current={isCurrent(href) ? "page" : undefined}
+                >
+                  {ui.nav[item.key]}
+                </a>
+              </li>
+            );
+          })
         }
         <li>
           <ExternalLink

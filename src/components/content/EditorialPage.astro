@@ -1,14 +1,18 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { contentSlug } from "../../lib/content";
+import { getUi } from "../../i18n";
+import { contentPath } from "../../lib/localized-content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 interface Props {
   entry: CollectionEntry<"pages">;
+  translationPath?: string;
 }
 
-const { entry } = Astro.props;
-const canonicalPath = `/${contentSlug(entry.id)}/`;
+const { entry, translationPath } = Astro.props;
+const locale = entry.data.lang;
+const ui = getUi(locale);
+const canonicalPath = contentPath(locale, "pages", entry.id);
 ---
 
 <BaseLayout
@@ -16,10 +20,11 @@ const canonicalPath = `/${contentSlug(entry.id)}/`;
   description={entry.data.seo.description}
   lang={entry.data.lang}
   canonicalPath={canonicalPath}
+  translationPath={translationPath}
 >
   <article class="site-frame editorial-page">
     <header class="editorial-page__header">
-      <p class="meta-label">Bash AI Lab</p>
+      <p class="meta-label">{ui.brand}</p>
       <h1 class="display-title">{entry.data.title}</h1>
       <p class="lead">{entry.data.description}</p>
     </header>
