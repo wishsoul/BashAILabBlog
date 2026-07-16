@@ -5,6 +5,7 @@ import TagList from "../components/content/TagList.astro";
 import BackToTop from "../components/layout/BackToTop.astro";
 import Breadcrumb from "../components/layout/Breadcrumb.astro";
 import { contentSlug } from "../lib/content";
+import { buildArticleJsonLd, DEFAULT_OG_IMAGE } from "../lib/seo";
 import BaseLayout from "./BaseLayout.astro";
 
 interface Heading {
@@ -31,13 +32,25 @@ const publicationLabel = publishedAt
       timeZone: "UTC",
     }).format(publishedAt)
   : undefined;
+const canonicalPath = `/research/${slug}/`;
+const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 ---
 
 <BaseLayout
   title={entry.data.seo.title}
   description={entry.data.seo.description}
   lang={entry.data.lang}
-  canonicalPath={`/research/${slug}/`}
+  canonicalPath={canonicalPath}
+  image={image}
+  openGraphType="article"
+  jsonLd={buildArticleJsonLd({
+    title: entry.data.title,
+    description: entry.data.description,
+    canonicalPath,
+    image,
+    publishedAt: entry.data.publishedAt,
+    updatedAt: entry.data.updatedAt,
+  })}
 >
   <article id="top" class="site-frame content-layout">
     <Breadcrumb

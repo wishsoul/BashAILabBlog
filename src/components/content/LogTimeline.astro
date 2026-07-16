@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { contentSlug } from "../../lib/content";
 
 interface Props {
   entries: CollectionEntry<"log">[];
@@ -34,7 +35,11 @@ const formatDate = (date: Date) =>
         <ol class="log-timeline__entries">
           {groupedEntries.map((entry) => (
             <li>
-              <article class="log-timeline__entry" data-log-entry>
+              <article
+                id={contentSlug(entry.id)}
+                class="log-timeline__entry"
+                data-log-entry
+              >
                 <p class="log-timeline__meta meta-label">{entry.data.type}</p>
                 <h2>{entry.data.title}</h2>
                 <p>{entry.data.summary}</p>

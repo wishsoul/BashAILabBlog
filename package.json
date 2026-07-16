@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "npm run og:generate && astro build",
     "preview": "astro preview",
     "check": "astro check",
     "lint": "eslint .",
@@ -17,7 +17,8 @@
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
-    "test:links": "node scripts/check-links.mjs"
+    "test:links": "node scripts/check-links.mjs",
+    "og:generate": "node scripts/generate-og.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.3",

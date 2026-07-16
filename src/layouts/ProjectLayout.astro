@@ -8,6 +8,7 @@ import Breadcrumb from "../components/layout/Breadcrumb.astro";
 import ProjectMetadata from "../components/work/ProjectMetadata.astro";
 import StatusIndicator from "../components/work/StatusIndicator.astro";
 import { contentSlug } from "../lib/content";
+import { buildWorkJsonLd, DEFAULT_OG_IMAGE } from "../lib/seo";
 import BaseLayout from "./BaseLayout.astro";
 
 interface Props {
@@ -18,13 +19,24 @@ const { entry } = Astro.props;
 const slug = contentSlug(entry.id);
 const projectNumber = String(entry.data.order).padStart(2, "0");
 const hasActions = Boolean(entry.data.github || entry.data.demo);
+const canonicalPath = `/work/${slug}/`;
+const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 ---
 
 <BaseLayout
   title={entry.data.seo.title}
   description={entry.data.seo.description}
   lang={entry.data.lang}
-  canonicalPath={`/work/${slug}/`}
+  canonicalPath={canonicalPath}
+  image={image}
+  jsonLd={buildWorkJsonLd({
+    title: entry.data.title,
+    description: entry.data.description,
+    canonicalPath,
+    image,
+    category: entry.data.category,
+    platform: entry.data.platform,
+  })}
 >
   <article id="top" class="site-frame project-layout">
     <Breadcrumb
