@@ -1,0 +1,157 @@
+---
+interface Props {
+  categories: readonly string[];
+}
+
+const { categories } = Astro.props;
+const filters = ["All", ...categories];
+---
+
+<div class="work-filter" data-work-filter>
+  <p id="work-filter-label" class="meta-label">Filter by category</p>
+  <div class="work-filter__controls" aria-labelledby="work-filter-label">
+    {
+      filters.map((filter) => (
+        <button
+          type="button"
+          data-work-filter-button
+          data-category={filter}
+          aria-pressed={filter === "All" ? "true" : "false"}
+        >
+          {filter}
+        </button>
+      ))
+    }
+  </div>
+  <noscript>
+    <p class="work-filter__note">All projects are shown.</p>
+  </noscript>
+</div>
+
+<script>
+  const filterRoot = document.querySelector<HTMLElement>("[data-work-filter]");
+  const filterButtons = [
+    ...(filterRoot?.querySelectorAll<HTMLButtonElement>(
+      "[data-work-filter-button]",
+    ) ?? []),
+  ];
+  const projectItems = [
+    ...document.querySelectorAll<HTMLElement>("[data-project-list-item]"),
+  ];
+  const availableFilters = new Set(
+    filterButtons.map((button) => button.dataset.category),
+  );
+
+  function filterFromUrl() {
+    const requested = new URL(window.location.href).searchParams.get(
+      "category",
+    );
+    return requested && availableFilters.has(requested) ? requested : "All";
+  }
+
+  function applyFilter(filter: string) {
+    for (const button of filterButtons) {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.category === filter),
+      );
+    }
+
+    for (const item of projectItems) {
+      item.hidden = filter !== "All" && item.dataset.projectCategory !== filter;
+    }
+  }
+
+  function persistFilter(filter: string) {
+    const url = new URL(window.location.href);
+    if (filter === "All") url.searchParams.delete("category");
+    else url.searchParams.set("category", filter);
+    window.history.pushState({}, "", url);
+  }
+
+  for (const button of filterButtons) {
+    button.addEventListener("click", () => {
+      const filter = button.dataset.category;
+      if (!filter) return;
+      applyFilter(filter);
+      persistFilter(filter);
+    });
+  }
+
+  window.addEventListener("popstate", () => applyFilter(filterFromUrl()));
+  applyFilter(filterFromUrl());
+</script>
+
+<style>
+  .work-filter {
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.35fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    padding-block: 1.25rem;
+    border-block: 1px solid var(--color-border);
+  }
+
+  .work-filter > p {
+    margin: 0;
+  }
+
+  .work-filter__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .work-filter button {
+    position: relative;
+    min-height: 2.5rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+  }
+
+  .work-filter button::before {
+    display: inline-block;
+    width: 0.34rem;
+    height: 0.34rem;
+    margin-inline-end: 0.55rem;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    content: "";
+  }
+
+  .work-filter button:hover,
+  .work-filter button[aria-pressed="true"] {
+    color: var(--color-text);
+  }
+
+  .work-filter button[aria-pressed="true"]::before {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+  }
+
+  .work-filter__note {
+    grid-column: 2;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+  }
+
+  @media (max-width: 40rem) {
+    .work-filter {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .work-filter__controls {
+      gap-inline: 1.1rem;
+    }
+
+    .work-filter__note {
+      grid-column: 1;
+    }
+  }
+</style>

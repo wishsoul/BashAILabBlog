@@ -1,0 +1,246 @@
+---
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+import { contentSlug } from "../../lib/content";
+import { withBase } from "../../lib/urls";
+import TagList from "../content/TagList.astro";
+import StatusIndicator from "./StatusIndicator.astro";
+
+interface Props {
+  entry: CollectionEntry<"work">;
+  index: number;
+}
+
+const { entry, index } = Astro.props;
+const number = String(index + 1).padStart(2, "0");
+const href = withBase(`/work/${contentSlug(entry.id)}/`);
+---
+
+<article
+  class:list={[
+    "project-list-item",
+    { "project-list-item--reversed": index % 2 === 1 },
+  ]}
+  data-project-list-item
+  data-project-category={entry.data.category}
+>
+  <div class="project-list-item__content">
+    <div class="project-list-item__index">
+      <span class="meta-label">{number} / {entry.data.category}</span>
+      <StatusIndicator status={entry.data.status} />
+    </div>
+
+    <div class="project-list-item__summary flow">
+      <p class="meta-label">{entry.data.platform}</p>
+      <h2 data-project-list-title>{entry.data.title}</h2>
+      <p>{entry.data.description}</p>
+    </div>
+
+    <TagList tags={entry.data.tags} label={`${entry.data.title} tags`} />
+
+    <a class="project-list-item__link" href={href}>
+      View {entry.data.title}<span aria-hidden="true">↗</span>
+    </a>
+  </div>
+
+  <div class="project-list-item__visual">
+    {
+      entry.data.cover ? (
+        <Image
+          class="project-list-item__image"
+          src={entry.data.cover}
+          alt=""
+          widths={[480, 720, 960]}
+          sizes="(max-width: 832px) 100vw, 52vw"
+        />
+      ) : (
+        <div class="project-specimen" data-typographic-cover aria-hidden="true">
+          <div class="project-specimen__topline">
+            <span>{number}</span>
+            <span>{entry.data.status}</span>
+          </div>
+          <p>{entry.data.category}</p>
+          <strong>{entry.data.title}</strong>
+          <div class="project-specimen__baseline">
+            <span>{entry.data.platform}</span>
+            <span>Bash AI Lab</span>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .project-list-item {
+    display: grid;
+    grid-template-areas: "content visual";
+    grid-template-columns: minmax(17rem, 0.8fr) minmax(22rem, 1.2fr);
+    gap: clamp(2rem, 7vw, 7rem);
+    padding-block: clamp(3.5rem, 8vw, 7.5rem);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .project-list-item--reversed {
+    grid-template-areas: "visual content";
+    grid-template-columns: minmax(22rem, 1.2fr) minmax(17rem, 0.8fr);
+  }
+
+  .project-list-item__content {
+    display: grid;
+    grid-area: content;
+    align-content: center;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .project-list-item__index {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-end: 1rem;
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .project-list-item__summary {
+    --flow-space: 0.9rem;
+  }
+
+  .project-list-item__summary h2 {
+    margin: 0;
+    font-size: clamp(var(--font-size-xl), 4vw, var(--font-size-2xl));
+    font-weight: 540;
+    letter-spacing: -0.055em;
+    line-height: 0.98;
+  }
+
+  .project-list-item__summary > p:last-child {
+    max-width: 34rem;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  .project-list-item__link {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.7rem;
+    border-block-end: 1px solid var(--color-border);
+    font-size: var(--font-size-sm);
+    font-weight: 520;
+    text-decoration: none;
+  }
+
+  .project-list-item__link span {
+    color: var(--color-accent);
+    transition: transform 160ms ease;
+  }
+
+  .project-list-item__link:hover span {
+    transform: translate(0.15rem, -0.15rem);
+  }
+
+  .project-list-item__visual {
+    min-width: 0;
+    grid-area: visual;
+  }
+
+  .project-list-item__image,
+  .project-specimen {
+    width: 100%;
+    min-height: clamp(22rem, 42vw, 36rem);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .project-list-item__image {
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .project-specimen {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    align-content: space-between;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    isolation: isolate;
+  }
+
+  .project-specimen::before {
+    position: absolute;
+    z-index: -1;
+    inset: 21% -10% auto 38%;
+    height: 1px;
+    background: var(--color-accent);
+    content: "";
+    transform: rotate(-31deg);
+    transform-origin: left;
+  }
+
+  .project-specimen::after {
+    position: absolute;
+    z-index: -1;
+    right: clamp(1.5rem, 4vw, 3rem);
+    bottom: clamp(4rem, 8vw, 6.5rem);
+    width: clamp(2.8rem, 6vw, 5rem);
+    aspect-ratio: 1;
+    border: 1px solid var(--color-accent);
+    border-radius: 50%;
+    content: "";
+  }
+
+  .project-specimen__topline,
+  .project-specimen__baseline {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .project-specimen > p {
+    align-self: end;
+    margin: auto 0 1rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .project-specimen strong {
+    max-width: 10ch;
+    margin-block-end: auto;
+    overflow-wrap: anywhere;
+    font-size: clamp(var(--font-size-xl), 6vw, 4.75rem);
+    font-weight: 520;
+    letter-spacing: -0.065em;
+    line-height: 0.92;
+  }
+
+  .project-specimen__baseline {
+    align-items: end;
+    padding-block-start: 1rem;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  @media (max-width: 52rem) {
+    .project-list-item,
+    .project-list-item--reversed {
+      grid-template-areas:
+        "content"
+        "visual";
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.5rem;
+    }
+
+    .project-list-item__image,
+    .project-specimen {
+      min-height: clamp(20rem, 105vw, 31rem);
+    }
+  }
+</style>

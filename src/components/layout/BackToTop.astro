@@ -1,0 +1,27 @@
+<a class="back-to-top" href="#top">
+  <span aria-hidden="true">↑</span>
+  Back to top
+</a>
+
+<style>
+  .back-to-top {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.7rem;
+    padding-block: 0.5rem;
+    border-block-end: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    text-decoration: none;
+  }
+
+  .back-to-top span {
+    color: var(--color-accent);
+    transition: transform 160ms ease;
+  }
+
+  .back-to-top:hover span {
+    transform: translateY(-0.2rem);
+  }
+</style>

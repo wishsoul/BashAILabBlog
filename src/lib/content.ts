@@ -2,16 +2,16 @@ import type { Locale } from "../config/site";
 
 type Entry<T> = { id: string; data: T };
 
-export function visibleEntries<T extends { draft: boolean }>(
-  entries: Entry<T>[],
+export function visibleEntries<E extends Entry<{ draft: boolean }>>(
+  entries: E[],
   production: boolean,
-) {
+): E[] {
   return production ? entries.filter((entry) => !entry.data.draft) : entries;
 }
 
 export function sortByOrderThenDate<
-  T extends { order?: number; publishedAt?: Date | null },
->(entries: Entry<T>[]) {
+  E extends Entry<{ order?: number; publishedAt?: Date | null }>,
+>(entries: E[]): E[] {
   return [...entries].sort(
     (a, b) =>
       (a.data.order ?? Number.MAX_SAFE_INTEGER) -

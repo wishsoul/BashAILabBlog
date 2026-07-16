@@ -1,0 +1,337 @@
+---
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+import ExternalLink from "../components/content/ExternalLink.astro";
+import TagList from "../components/content/TagList.astro";
+import BackToTop from "../components/layout/BackToTop.astro";
+import Breadcrumb from "../components/layout/Breadcrumb.astro";
+import ProjectMetadata from "../components/work/ProjectMetadata.astro";
+import StatusIndicator from "../components/work/StatusIndicator.astro";
+import { contentSlug } from "../lib/content";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  entry: CollectionEntry<"work">;
+}
+
+const { entry } = Astro.props;
+const slug = contentSlug(entry.id);
+const projectNumber = String(entry.data.order).padStart(2, "0");
+const hasActions = Boolean(entry.data.github || entry.data.demo);
+---
+
+<BaseLayout
+  title={entry.data.seo.title}
+  description={entry.data.seo.description}
+  lang={entry.data.lang}
+  canonicalPath={`/work/${slug}/`}
+>
+  <article id="top" class="site-frame project-layout">
+    <Breadcrumb
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Work", href: "/work/" },
+        { label: entry.data.title },
+      ]}
+    />
+
+    <header class="project-layout__header">
+      <div class="project-layout__identity">
+        <div class="project-layout__eyebrow">
+          <p class="meta-label">
+            {projectNumber} / {entry.data.category}
+          </p>
+          <StatusIndicator status={entry.data.status} />
+        </div>
+        <h1>{entry.data.title}</h1>
+        <p class="lead">{entry.data.description}</p>
+        <TagList tags={entry.data.tags} label={`${entry.data.title} tags`} />
+      </div>
+
+      <div class="project-layout__visual">
+        {
+          entry.data.cover ? (
+            <Image
+              class="project-layout__image"
+              src={entry.data.cover}
+              alt=""
+              widths={[640, 960, 1280]}
+              sizes="(max-width: 896px) 100vw, 48vw"
+            />
+          ) : (
+            <div class="project-hero-specimen" aria-hidden="true">
+              <span>{projectNumber}</span>
+              <strong>{entry.data.title}</strong>
+              <p>
+                {entry.data.platform} / {entry.data.category}
+              </p>
+            </div>
+          )
+        }
+      </div>
+    </header>
+
+    <section class="project-layout__facts" aria-label="Project information">
+      <ProjectMetadata entry={entry} />
+      {
+        hasActions && (
+          <div class="project-layout__actions" data-project-actions>
+            {entry.data.github && (
+              <ExternalLink href={entry.data.github}>GitHub</ExternalLink>
+            )}
+            {entry.data.demo && (
+              <ExternalLink href={entry.data.demo}>Demo</ExternalLink>
+            )}
+          </div>
+        )
+      }
+    </section>
+
+    <div class="project-layout__body">
+      <aside class="project-layout__rail" aria-hidden="true">
+        <span>{projectNumber}</span>
+        <span>Case study</span>
+      </aside>
+      <div class="project-case-study" data-project-case-study>
+        <slot />
+      </div>
+    </div>
+
+    <footer class="project-layout__footer">
+      <BackToTop />
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .project-layout {
+    padding-block: 2rem clamp(5rem, 10vw, 9rem);
+  }
+
+  .project-layout__header {
+    display: grid;
+    grid-template-areas: "identity visual";
+    grid-template-columns: minmax(20rem, 0.9fr) minmax(24rem, 1.1fr);
+    gap: clamp(2.5rem, 7vw, 7rem);
+    align-items: stretch;
+    padding-block: clamp(3rem, 8vw, 7rem);
+  }
+
+  .project-layout__identity {
+    display: grid;
+    grid-area: identity;
+    align-content: center;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .project-layout__eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-end: 1rem;
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .project-layout__eyebrow p {
+    margin: 0;
+  }
+
+  .project-layout h1 {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: clamp(var(--font-size-2xl), 7vw, 5.5rem);
+    font-weight: 550;
+    letter-spacing: -0.07em;
+    line-height: 0.9;
+  }
+
+  .project-layout .lead {
+    margin: 0;
+  }
+
+  .project-layout__visual {
+    min-width: 0;
+    grid-area: visual;
+  }
+
+  .project-layout__image,
+  .project-hero-specimen {
+    width: 100%;
+    min-height: clamp(28rem, 52vw, 43rem);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .project-layout__image {
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .project-hero-specimen {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    align-content: space-between;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    isolation: isolate;
+  }
+
+  .project-hero-specimen::before {
+    position: absolute;
+    z-index: -1;
+    top: 48%;
+    left: -12%;
+    width: 124%;
+    height: 1px;
+    background: var(--color-accent);
+    content: "";
+    transform: rotate(-28deg);
+  }
+
+  .project-hero-specimen::after {
+    position: absolute;
+    z-index: -1;
+    top: 15%;
+    right: 12%;
+    width: clamp(4rem, 9vw, 8rem);
+    aspect-ratio: 1;
+    border: 1px solid var(--color-accent);
+    border-radius: 50%;
+    content: "";
+  }
+
+  .project-hero-specimen > span,
+  .project-hero-specimen > p {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .project-hero-specimen strong {
+    max-width: 9ch;
+    overflow-wrap: anywhere;
+    font-size: clamp(var(--font-size-xl), 6vw, 5.2rem);
+    font-weight: 520;
+    letter-spacing: -0.07em;
+    line-height: 0.88;
+  }
+
+  .project-hero-specimen > p {
+    padding-block-start: 1rem;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .project-layout__facts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2rem;
+    align-items: end;
+    padding-block: 1.5rem clamp(4rem, 9vw, 8rem);
+  }
+
+  .project-layout__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    padding-block: 1rem;
+    font-size: var(--font-size-sm);
+  }
+
+  .project-layout__body {
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.35fr) minmax(0, 1fr);
+    gap: clamp(2rem, 8vw, 8rem);
+    align-items: start;
+    padding-block-start: clamp(3rem, 7vw, 6rem);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .project-layout__rail {
+    position: sticky;
+    top: calc(var(--site-header-height) + 2rem);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .project-case-study {
+    width: min(100%, var(--reading-width));
+  }
+
+  .project-case-study :global(h2) {
+    margin: clamp(4rem, 8vw, 7rem) 0 1.25rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--color-border);
+    font-size: var(--font-size-lg);
+    font-weight: 540;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+  }
+
+  .project-case-study :global(h2:first-child) {
+    margin-block-start: 0;
+  }
+
+  .project-case-study :global(p) {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-md);
+    line-height: 1.65;
+  }
+
+  .project-case-study :global(h2 + p) {
+    margin-block-start: 0;
+  }
+
+  .project-case-study :global(img),
+  .project-case-study :global(video),
+  .project-case-study :global(pre),
+  .project-case-study :global(table) {
+    max-width: 100%;
+    margin-block: 2rem;
+  }
+
+  .project-case-study :global(pre),
+  .project-case-study :global(table) {
+    overflow-x: auto;
+  }
+
+  .project-layout__footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-block-start: clamp(4rem, 8vw, 7rem);
+  }
+
+  @media (max-width: 56rem) {
+    .project-layout__header {
+      grid-template-areas:
+        "identity"
+        "visual";
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .project-layout__image,
+    .project-hero-specimen {
+      min-height: clamp(22rem, 112vw, 36rem);
+    }
+
+    .project-layout__facts,
+    .project-layout__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .project-layout__rail {
+      position: static;
+      padding-block-end: 1rem;
+      border-block-end: 1px solid var(--color-border);
+    }
+  }
+</style>

@@ -1,0 +1,68 @@
+---
+import { withBase } from "../../lib/urls";
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: readonly BreadcrumbItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    {
+      items.map((item, index) => (
+        <li>
+          {item.href ? (
+            <a href={withBase(item.href)}>{item.label}</a>
+          ) : (
+            <span aria-current="page">{item.label}</span>
+          )}
+          {index < items.length - 1 && (
+            <span class="breadcrumb__separator" aria-hidden="true">
+              /
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    padding: 0;
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    list-style: none;
+  }
+
+  .breadcrumb li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .breadcrumb a {
+    min-height: 2.5rem;
+    align-content: center;
+  }
+
+  .breadcrumb [aria-current="page"] {
+    color: var(--color-text);
+  }
+
+  .breadcrumb__separator {
+    color: var(--color-border);
+  }
+</style>
