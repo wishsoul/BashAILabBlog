@@ -56,6 +56,7 @@ export interface UiCopy {
   project: {
     featuredWork: string;
     view: string;
+    demo: string;
     caseStudy: string;
   };
   cta: {
@@ -161,6 +162,7 @@ export const en = {
   project: {
     featuredWork: "Featured Work",
     view: "View",
+    demo: "Demo",
     caseStudy: "Case study",
   },
   cta: {

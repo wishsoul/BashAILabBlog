@@ -57,7 +57,7 @@ const latestResearch = visibleResearch
       label="Research Index"
       title="Current Research"
     />
-    <ResearchIndex entries={researchThemes} />
+    <ResearchIndex entries={researchThemes} locale="en" />
   </section>
 
   <section
@@ -78,6 +78,7 @@ const latestResearch = visibleResearch
             entry={entry}
             index={index}
             linkLabel={ui.cta.viewProject}
+            locale="en"
           />
         ))
       }
@@ -96,7 +97,11 @@ const latestResearch = visibleResearch
       title="Latest Research"
     />
     <ol class="latest-research">
-      {latestResearch.map((entry) => <ArticleListItem entry={entry} />)}
+      {
+        latestResearch.map((entry) => (
+          <ArticleListItem entry={entry} locale="en" />
+        ))
+      }
     </ol>
   </section>
 

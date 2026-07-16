@@ -12,10 +12,10 @@ import StatusIndicator from "./StatusIndicator.astro";
 interface Props {
   entry: CollectionEntry<"work">;
   index: number;
-  locale?: Locale;
+  locale: Locale;
 }
 
-const { entry, index, locale = entry.data.lang } = Astro.props;
+const { entry, index, locale } = Astro.props;
 const ui = getUi(locale);
 const number = String(index + 1).padStart(2, "0");
 const href = withBase(contentPath(locale, "work", entry.id));

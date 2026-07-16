@@ -6,10 +6,10 @@ import { withBase } from "../../lib/urls";
 
 interface Props {
   entries: CollectionEntry<"research">[];
-  locale?: Locale;
+  locale: Locale;
 }
 
-const { entries, locale = entries[0]?.data.lang ?? "en" } = Astro.props;
+const { entries, locale } = Astro.props;
 ---
 
 <ol class="research-index">

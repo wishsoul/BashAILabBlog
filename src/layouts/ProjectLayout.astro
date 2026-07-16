@@ -101,10 +101,20 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
         hasActions && (
           <div class="project-layout__actions" data-project-actions>
             {entry.data.github && (
-              <ExternalLink href={entry.data.github}>GitHub</ExternalLink>
+              <ExternalLink
+                href={entry.data.github}
+                newWindowLabel={ui.common.opensNewTab}
+              >
+                GitHub
+              </ExternalLink>
             )}
             {entry.data.demo && (
-              <ExternalLink href={entry.data.demo}>Demo</ExternalLink>
+              <ExternalLink
+                href={entry.data.demo}
+                newWindowLabel={ui.common.opensNewTab}
+              >
+                {ui.project.demo}
+              </ExternalLink>
             )}
           </div>
         )

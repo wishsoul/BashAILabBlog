@@ -36,7 +36,7 @@ const categories = [...new Set(projects.map((entry) => entry.data.category))];
     <section class="work-archive__projects" aria-label="Project archive">
       {
         projects.map((entry, index) => (
-          <ProjectListItem entry={entry} index={index} />
+          <ProjectListItem entry={entry} index={index} locale="en" />
         ))
       }
     </section>

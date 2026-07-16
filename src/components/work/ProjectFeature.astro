@@ -13,10 +13,10 @@ interface Props {
   entry: CollectionEntry<"work">;
   index: number;
   linkLabel: string;
-  locale?: Locale;
+  locale: Locale;
 }
 
-const { entry, index, linkLabel, locale = entry.data.lang } = Astro.props;
+const { entry, index, linkLabel, locale } = Astro.props;
 const ui = getUi(locale);
 const number = String(index + 1).padStart(2, "0");
 const isReversed = index % 2 === 1;

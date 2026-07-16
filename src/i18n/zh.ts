@@ -59,6 +59,7 @@ export const zh = {
   project: {
     featuredWork: "精选作品",
     view: "查看",
+    demo: "演示",
     caseStudy: "案例研究",
   },
   cta: {

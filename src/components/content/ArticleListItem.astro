@@ -9,10 +9,10 @@ import { withBase } from "../../lib/urls";
 
 interface Props {
   entry: CollectionEntry<"research">;
-  locale?: Locale;
+  locale: Locale;
 }
 
-const { entry, locale = entry.data.lang } = Astro.props;
+const { entry, locale } = Astro.props;
 const ui = getUi(locale);
 const publishedAt = entry.data.publishedAt;
 const sourceText =
