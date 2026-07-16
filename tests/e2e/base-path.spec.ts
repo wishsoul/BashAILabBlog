@@ -1,20 +1,4 @@
-import { readdir, readFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { expect, test } from "@playwright/test";
-
-async function htmlFiles(directory: string, current = ""): Promise<string[]> {
-  const entries = await readdir(resolve(directory, current), {
-    withFileTypes: true,
-  });
-  const files = await Promise.all(
-    entries.map(async (entry) => {
-      const file = `${current}${entry.name}`;
-      if (entry.isDirectory()) return htmlFiles(directory, `${file}/`);
-      return entry.isFile() && file.endsWith(".html") ? [file] : [];
-    }),
-  );
-  return files.flat();
-}
 
 test("serves pages, assets, and feeds beneath the GitHub Pages base path", async ({
   page,
@@ -62,11 +46,42 @@ test("serves pages, assets, and feeds beneath the GitHub Pages base path", async
   );
 });
 
-test("does not emit direct /work/ links in generated HTML", async () => {
-  const files = await htmlFiles(resolve("dist"));
-  const documents = await Promise.all(
-    files.map((file) => readFile(resolve("dist", file), "utf8")),
+test("does not emit direct local /work/ references in generated pages", async ({
+  page,
+}) => {
+  const sitemap = await page.request.get("/BashAILabBlog/sitemap-0.xml");
+  expect(sitemap.ok()).toBe(true);
+  const routes = await page.evaluate(
+    (xml) => {
+      const document = new DOMParser().parseFromString(xml, "application/xml");
+      return [...document.querySelectorAll("loc")].map(
+        (location) =>
+          new URL(location.textContent ?? "", window.location.href).pathname,
+      );
+    },
+    await sitemap.text(),
   );
 
-  expect(documents.join("\n")).not.toContain('href="/work/"');
+  for (const route of [...routes, "/BashAILabBlog/404.html"]) {
+    const response = await page.goto(route);
+    expect(response?.ok()).toBe(true);
+
+    const directWorkReferences = await page
+      .locator("[href], [src]")
+      .evaluateAll((elements) =>
+        elements
+          .map(
+            (element) =>
+              element.getAttribute("href") ?? element.getAttribute("src"),
+          )
+          .filter((reference) => {
+            if (!reference?.startsWith("/work/")) return false;
+            return (
+              new URL(reference, window.location.href).pathname === "/work/"
+            );
+          }),
+      );
+
+    expect(directWorkReferences).toEqual([]);
+  }
 });
