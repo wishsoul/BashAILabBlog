@@ -1,23 +1,23 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
-import MDXCallout from "../../components/mdx/MDXCallout.astro";
-import BeforeAfter from "../../components/mdx/BeforeAfter.astro";
-import ConstraintFlow from "../../components/mdx/ConstraintFlow.astro";
-import MetricBlock from "../../components/mdx/MetricBlock.astro";
-import QuoteBlock from "../../components/mdx/QuoteBlock.astro";
-import Timeline from "../../components/mdx/Timeline.astro";
-import ContentLayout from "../../layouts/ContentLayout.astro";
+import BeforeAfter from "../../../components/mdx/BeforeAfter.astro";
+import ConstraintFlow from "../../../components/mdx/ConstraintFlow.astro";
+import MDXCallout from "../../../components/mdx/MDXCallout.astro";
+import MetricBlock from "../../../components/mdx/MetricBlock.astro";
+import QuoteBlock from "../../../components/mdx/QuoteBlock.astro";
+import Timeline from "../../../components/mdx/Timeline.astro";
+import ContentLayout from "../../../layouts/ContentLayout.astro";
 import {
   contentSlug,
   estimateReadingMinutes,
   visibleEntries,
-} from "../../lib/content";
-import { translationPath } from "../../lib/localized-content";
+} from "../../../lib/content";
+import { translationPath } from "../../../lib/localized-content";
 
 export async function getStaticPaths() {
   const entries = await getCollection("research");
   return visibleEntries(entries, import.meta.env.PROD)
-    .filter((entry) => entry.data.lang === "en")
+    .filter((entry) => entry.data.lang === "zh")
     .map((entry) => ({
       params: { slug: contentSlug(entry.id) },
       props: {

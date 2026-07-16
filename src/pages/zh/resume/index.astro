@@ -1,0 +1,17 @@
+---
+import { getCollection, render } from "astro:content";
+import EditorialPage from "../../../components/content/EditorialPage.astro";
+import { withBase } from "../../../lib/urls";
+
+const entry = (await getCollection("pages")).find(
+  (page) => page.id === "zh/resume" && !page.data.draft,
+);
+
+if (!entry) return Astro.redirect(withBase("/resume/"));
+
+const { Content } = await render(entry);
+---
+
+<EditorialPage entry={entry} translationPath="/resume/">
+  <Content />
+</EditorialPage>

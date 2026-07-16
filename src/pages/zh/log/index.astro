@@ -1,30 +1,28 @@
 ---
 import { getCollection } from "astro:content";
-import LogTimeline from "../../components/content/LogTimeline.astro";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { visibleEntries } from "../../lib/content";
+import LogTimeline from "../../../components/content/LogTimeline.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { visibleEntries } from "../../../lib/content";
 
 const allEntries = await getCollection("log");
 const entries = visibleEntries(
-  allEntries.filter((entry) => entry.data.lang === "en"),
+  allEntries.filter((entry) => entry.data.lang === "zh"),
   import.meta.env.PROD,
 ).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
 <BaseLayout
-  title="Log"
-  description="Build notes, research decisions, experiments, and changelog entries from Bash AI Lab."
-  lang="en"
-  canonicalPath="/log/"
-  translationPath="/zh/log/"
+  title="日志"
+  description="Bash AI 实验室的构建笔记、研究决策、实验与更新记录。"
+  lang="zh"
+  canonicalPath="/zh/log/"
+  translationPath="/log/"
 >
   <article class="site-frame log-page">
     <header class="log-page__header">
-      <p class="meta-label">Build notes / Research decisions / Experiments</p>
-      <h1 class="display-title">Log</h1>
-      <p class="lead">
-        A dated record of work in progress, decisions, and research notes.
-      </p>
+      <p class="meta-label">构建笔记 / 研究决策 / 实验</p>
+      <h1 class="display-title">日志</h1>
+      <p class="lead">持续记录正在进行的工作、决策与研究笔记。</p>
     </header>
 
     <LogTimeline entries={entries} />

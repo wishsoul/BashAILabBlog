@@ -1,14 +1,14 @@
 ---
 import { getCollection } from "astro:content";
-import WorkFilter from "../../components/work/WorkFilter.astro";
-import ProjectListItem from "../../components/work/ProjectListItem.astro";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { sortByOrderThenDate, visibleEntries } from "../../lib/content";
+import ProjectListItem from "../../../components/work/ProjectListItem.astro";
+import WorkFilter from "../../../components/work/WorkFilter.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { sortByOrderThenDate, visibleEntries } from "../../../lib/content";
 
 const allWork = await getCollection("work");
 const projects = sortByOrderThenDate(
   visibleEntries(
-    allWork.filter((entry) => entry.data.lang === "en"),
+    allWork.filter((entry) => entry.data.lang === "zh"),
     import.meta.env.PROD,
   ),
 );
@@ -16,28 +16,25 @@ const categories = [...new Set(projects.map((entry) => entry.data.category))];
 ---
 
 <BaseLayout
-  title="Work"
-  description="Independent products, interface infrastructure, and experiments from Bash AI Lab."
-  lang="en"
-  canonicalPath="/work/"
-  translationPath="/zh/work/"
+  title="作品"
+  description="Bash AI 实验室的独立产品、界面基础设施与实验。"
+  lang="zh"
+  canonicalPath="/zh/work/"
+  translationPath="/work/"
 >
   <div class="site-frame work-archive">
     <header class="work-archive__header">
-      <p class="meta-label">Independent software / Systems / Experiments</p>
-      <h1 class="display-title">Work</h1>
-      <p class="lead">
-        Products and technical systems developed through research, constraint
-        design, and hands-on implementation.
-      </p>
+      <p class="meta-label">独立软件 / 系统 / 实验</p>
+      <h1 class="display-title">作品</h1>
+      <p class="lead">通过研究、约束设计与亲自实现构建的产品和技术系统。</p>
     </header>
 
-    <WorkFilter categories={categories} />
+    <WorkFilter categories={categories} locale="zh" />
 
-    <section class="work-archive__projects" aria-label="Project archive">
+    <section class="work-archive__projects" aria-label="项目归档">
       {
         projects.map((entry, index) => (
-          <ProjectListItem entry={entry} index={index} locale="en" />
+          <ProjectListItem entry={entry} index={index} locale="zh" />
         ))
       }
     </section>

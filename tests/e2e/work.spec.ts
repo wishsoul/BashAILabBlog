@@ -139,6 +139,16 @@ test("builds all four project routes and renders the approved case-study sequenc
   ]);
 });
 
+test("switches the published paired Work detail between languages", async ({
+  page,
+}) => {
+  await page.goto("./work/mac-native-kit/");
+
+  await expect(
+    page.getByRole("link", { name: "切换到中文" }).first(),
+  ).toHaveAttribute("href", "/BashAILabBlog/zh/work/mac-native-kit/");
+});
+
 test("marks Work current on both the archive and nested project routes", async ({
   page,
 }) => {

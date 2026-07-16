@@ -11,6 +11,6 @@ if (!entry) throw new Error("Missing approved About page content.");
 const { Content } = await render(entry);
 ---
 
-<EditorialPage entry={entry}>
+<EditorialPage entry={entry} translationPath="/zh/about/">
   <Content />
 </EditorialPage>

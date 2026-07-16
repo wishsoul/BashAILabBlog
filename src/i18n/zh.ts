@@ -36,7 +36,7 @@ export const zh = {
   },
   hero: {
     eyebrow: "Bash AI 实验室 / 独立研究实践",
-    title: "构建让一个人借助 AI 创造软件的系统。",
+    title: "构建帮助个人借助 AI 创造软件的系统。",
     description:
       "我研究 AI 智能体、产品系统和受约束的界面如何将想法转化为可上线的软件。",
     researchAreas: "研究方向",
