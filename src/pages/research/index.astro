@@ -1,0 +1,132 @@
+---
+import { getCollection } from "astro:content";
+import ArticleListItem from "../../components/content/ArticleListItem.astro";
+import ResearchIndex from "../../components/content/ResearchIndex.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { sortByOrderThenDate, visibleEntries } from "../../lib/content";
+
+const allResearch = await getCollection("research");
+const research = visibleEntries(
+  allResearch.filter((entry) => entry.data.lang === "en"),
+  import.meta.env.PROD,
+);
+const themes = [...research]
+  .filter((entry) => entry.data.kind === "theme")
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+const articles = sortByOrderThenDate(
+  research.filter((entry) => entry.data.kind === "article"),
+);
+---
+
+<BaseLayout
+  title="Research"
+  description="Research notes, frameworks, and themes from Bash AI Lab."
+  lang="en"
+  canonicalPath="/research/"
+>
+  <div class="site-frame research-archive">
+    <header class="research-archive__header">
+      <p class="meta-label">Notes / Frameworks / Product systems</p>
+      <h1 class="display-title">Research</h1>
+      <p class="lead">
+        Research into agentic development, AI-native interfaces, and the systems
+        that connect product direction with implementation.
+      </p>
+    </header>
+
+    <section class="research-archive__themes" aria-labelledby="research-themes">
+      <div class="research-archive__section-heading">
+        <p class="meta-label">Themes</p>
+        <h2 id="research-themes">Research directions</h2>
+      </div>
+      <ResearchIndex entries={themes} />
+    </section>
+
+    <section
+      class="research-archive__articles"
+      aria-labelledby="research-articles"
+    >
+      <div class="research-archive__section-heading">
+        <p class="meta-label">Articles</p>
+        <h2 id="research-articles">Published notes</h2>
+      </div>
+      <ol class="research-archive__article-list">
+        {articles.map((entry) => <ArticleListItem entry={entry} />)}
+      </ol>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .research-archive {
+    padding-block: clamp(4rem, 9vw, 8rem) clamp(5rem, 10vw, 9rem);
+  }
+
+  .research-archive__header {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(18rem, 1.15fr);
+    gap: 1rem clamp(2rem, 8vw, 8rem);
+    align-items: end;
+    padding-block-end: clamp(4rem, 9vw, 8rem);
+  }
+
+  .research-archive__header > .meta-label {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+
+  .research-archive__header h1,
+  .research-archive__header .lead {
+    margin: 0;
+  }
+
+  .research-archive__themes,
+  .research-archive__articles {
+    padding-block-start: clamp(3rem, 7vw, 6rem);
+  }
+
+  .research-archive__articles {
+    margin-block-start: clamp(3rem, 8vw, 7rem);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .research-archive__section-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: baseline;
+    padding-block-end: 1.5rem;
+  }
+
+  .research-archive__section-heading p,
+  .research-archive__section-heading h2 {
+    margin: 0;
+  }
+
+  .research-archive__section-heading h2 {
+    font-size: var(--font-size-md);
+    font-weight: 540;
+    letter-spacing: -0.03em;
+  }
+
+  .research-archive__article-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 46rem) {
+    .research-archive__header {
+      grid-template-columns: 1fr;
+    }
+
+    .research-archive__header > .meta-label {
+      grid-column: 1;
+    }
+
+    .research-archive__section-heading {
+      display: grid;
+      gap: 0.5rem;
+    }
+  }
+</style>

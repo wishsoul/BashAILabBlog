@@ -1,0 +1,137 @@
+---
+interface Props {
+  chart: string;
+  label?: string;
+}
+
+const { chart, label = "Diagram" } = Astro.props;
+const definition = chart.trim();
+---
+
+<figure
+  class="mermaid-diagram"
+  data-mermaid-diagram
+  data-mermaid-loader
+  data-mermaid-chart={definition}
+  aria-label={label}
+>
+  <div class="mermaid-diagram__canvas" aria-busy="true"></div>
+  <details class="mermaid-diagram__fallback" data-mermaid-fallback open>
+    <summary>{label} (text fallback)</summary>
+    <pre>{definition}</pre>
+  </details>
+</figure>
+
+<script>
+  const diagrams = document.querySelectorAll<HTMLElement>(
+    "[data-mermaid-diagram]",
+  );
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  type IdleCallbackWindow = Omit<Window, "requestIdleCallback"> & {
+    requestIdleCallback?: (
+      callback: () => void,
+      options?: { timeout?: number },
+    ) => number;
+  };
+
+  function whenIdle(callback: () => void) {
+    const idleWindow = window as IdleCallbackWindow;
+
+    if (idleWindow.requestIdleCallback) {
+      idleWindow.requestIdleCallback(callback, { timeout: 1200 });
+      return;
+    }
+
+    globalThis.setTimeout(callback, 0);
+  }
+
+  if (!prefersReducedMotion && diagrams.length > 0) {
+    whenIdle(() => {
+      void Promise.all(
+        [...diagrams].map(async (diagram, index) => {
+          const definition = diagram.dataset.mermaidChart;
+          const canvas = diagram.querySelector<HTMLElement>(
+            ".mermaid-diagram__canvas",
+          );
+          const fallback = diagram.querySelector<HTMLDetailsElement>(
+            "[data-mermaid-fallback]",
+          );
+
+          if (!definition || !canvas || !fallback) return;
+
+          try {
+            const { default: mermaid } = await import("mermaid");
+            mermaid.initialize({
+              securityLevel: "strict",
+              startOnLoad: false,
+              theme:
+                document.documentElement.dataset.theme === "dark"
+                  ? "dark"
+                  : "default",
+            });
+            const { svg, bindFunctions } = await mermaid.render(
+              `mermaid-${index}`,
+              definition,
+            );
+
+            canvas.innerHTML = svg;
+            bindFunctions?.(canvas);
+            canvas.setAttribute("aria-busy", "false");
+            fallback.open = false;
+          } catch {
+            canvas.setAttribute("aria-busy", "false");
+          }
+        }),
+      );
+    });
+  } else {
+    diagrams.forEach((diagram) => {
+      diagram
+        .querySelector<HTMLElement>(".mermaid-diagram__canvas")
+        ?.setAttribute("aria-busy", "false");
+    });
+  }
+</script>
+
+<style>
+  .mermaid-diagram {
+    padding: clamp(1rem, 3vw, 2rem);
+    margin: 2rem 0;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .mermaid-diagram__canvas :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+
+  .mermaid-diagram__fallback {
+    margin-block-start: 1rem;
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+  }
+
+  .mermaid-diagram__fallback summary {
+    cursor: pointer;
+  }
+
+  .mermaid-diagram__fallback pre {
+    overflow-x: auto;
+    padding: 0.75rem;
+    margin: 0.75rem 0 0;
+    background: var(--color-background);
+    white-space: pre-wrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mermaid-diagram :global(*) {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+interface TimelineItem {
+  label: string;
+  title: string;
+  description?: string;
+}
+
+interface Props {
+  items: TimelineItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<ol class="mdx-timeline">
+  {
+    items.map((item) => (
+      <li>
+        <p>{item.label}</p>
+        <h3>{item.title}</h3>
+        {item.description && <span>{item.description}</span>}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .mdx-timeline {
+    display: grid;
+    gap: 1.25rem;
+    padding: 0;
+    margin: 2rem 0;
+    list-style: none;
+  }
+
+  .mdx-timeline li {
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+  }
+
+  .mdx-timeline p,
+  .mdx-timeline h3,
+  .mdx-timeline span {
+    display: block;
+    margin: 0;
+  }
+
+  .mdx-timeline p {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+  }
+
+  .mdx-timeline h3 {
+    margin-block: 0.5rem;
+    font-size: var(--font-size-md);
+  }
+
+  .mdx-timeline span {
+    color: var(--color-text-secondary);
+  }
+</style>

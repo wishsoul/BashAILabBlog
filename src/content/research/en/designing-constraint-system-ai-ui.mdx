@@ -16,8 +16,25 @@ seo:
   description: A research note on constraint systems for AI-generated native interfaces.
 ---
 
+## A constrained system
+
 AI-generated native interfaces need more than visual instructions if they are to remain consistent across design and implementation.
 
 This research direction organizes constraints through rules, design tokens, a runtime, validators, and code generation. MacNativeKit is the associated infrastructure profile for exploring that system on macOS with SwiftUI and AppKit.
 
-No public performance result or comparative metric is claimed in this initial note.
+<Mermaid
+  label="Constraint-system flow"
+  chart={`flowchart LR
+  Intent --> Rules
+  Rules --> Tokens
+  Tokens --> Runtime
+  Runtime --> Validation
+  Validation --> Codegen`}
+/>
+
+## Working scope
+
+<Callout title="Research note">
+  No public performance result or comparative metric is claimed in this initial
+  note.
+</Callout>

@@ -1,0 +1,54 @@
+---
+interface Props {
+  label: string;
+  value: string | number;
+  detail?: string;
+}
+
+const { label, value, detail } = Astro.props;
+---
+
+<dl class="metric-block">
+  <div>
+    <dt>{label}</dt>
+    <dd>{value}</dd>
+  </div>
+  {detail && <p>{detail}</p>}
+</dl>
+
+<style>
+  .metric-block {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.25rem 0;
+    margin-block: 2rem;
+    border-block: 1px solid var(--color-border);
+  }
+
+  .metric-block div {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .metric-block dt {
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .metric-block dd {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 540;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .metric-block p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+</style>

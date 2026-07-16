@@ -1,0 +1,37 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = "Note" } = Astro.props;
+---
+
+<aside class="mdx-callout" role="note" aria-label={title}>
+  <p class="mdx-callout__title">{title}</p>
+  <div class="mdx-callout__body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .mdx-callout {
+    margin-block: 2rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-inline-start: 0.2rem solid var(--color-accent);
+    background: var(--color-surface);
+  }
+
+  .mdx-callout__title {
+    margin: 0 0 0.55rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .mdx-callout__body :global(p) {
+    margin: 0;
+  }
+</style>

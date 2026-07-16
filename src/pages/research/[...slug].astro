@@ -1,0 +1,49 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import MDXCallout from "../../components/mdx/MDXCallout.astro";
+import BeforeAfter from "../../components/mdx/BeforeAfter.astro";
+import MermaidDiagram from "../../components/mdx/MermaidDiagram.astro";
+import MetricBlock from "../../components/mdx/MetricBlock.astro";
+import QuoteBlock from "../../components/mdx/QuoteBlock.astro";
+import Timeline from "../../components/mdx/Timeline.astro";
+import ContentLayout from "../../layouts/ContentLayout.astro";
+import {
+  contentSlug,
+  estimateReadingMinutes,
+  visibleEntries,
+} from "../../lib/content";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("research");
+  return visibleEntries(entries, import.meta.env.PROD)
+    .filter((entry) => entry.data.lang === "en")
+    .map((entry) => ({
+      params: { slug: contentSlug(entry.id) },
+      props: { entry },
+    }));
+}
+
+interface Props {
+  entry: CollectionEntry<"research">;
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const sourceText =
+  "body" in entry && typeof entry.body === "string"
+    ? entry.body
+    : entry.data.description;
+const minutes = entry.data.readingMinutes ?? estimateReadingMinutes(sourceText);
+const mdxComponents = {
+  Callout: MDXCallout,
+  Metric: MetricBlock,
+  Mermaid: MermaidDiagram,
+  Timeline,
+  Quote: QuoteBlock,
+  BeforeAfter,
+};
+---
+
+<ContentLayout entry={entry} headings={headings} minutes={minutes}>
+  <Content components={mdxComponents} />
+</ContentLayout>

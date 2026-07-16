@@ -1,0 +1,221 @@
+---
+import type { CollectionEntry } from "astro:content";
+import TableOfContents from "../components/content/TableOfContents.astro";
+import TagList from "../components/content/TagList.astro";
+import BackToTop from "../components/layout/BackToTop.astro";
+import Breadcrumb from "../components/layout/Breadcrumb.astro";
+import { contentSlug } from "../lib/content";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  entry: CollectionEntry<"research">;
+  headings: Heading[];
+  minutes: number;
+}
+
+const { entry, headings, minutes } = Astro.props;
+const slug = contentSlug(entry.id);
+const publishedAt = entry.data.publishedAt;
+const publicationDate = publishedAt?.toISOString().slice(0, 10);
+const publicationLabel = publishedAt
+  ? new Intl.DateTimeFormat("en", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(publishedAt)
+  : undefined;
+---
+
+<BaseLayout
+  title={entry.data.seo.title}
+  description={entry.data.seo.description}
+  lang={entry.data.lang}
+  canonicalPath={`/research/${slug}/`}
+>
+  <article id="top" class="site-frame content-layout">
+    <Breadcrumb
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Research", href: "/research/" },
+        { label: entry.data.title },
+      ]}
+    />
+
+    <header class="content-layout__header">
+      <p class="meta-label">
+        {entry.data.category} / {entry.data.status}
+      </p>
+      <h1>{entry.data.title}</h1>
+      <p class="lead">{entry.data.description}</p>
+    </header>
+
+    <section
+      class="content-layout__metadata"
+      aria-label="Publication details"
+      data-publication-metadata
+    >
+      {
+        publicationDate && publicationLabel && (
+          <time datetime={publicationDate}>{publicationLabel}</time>
+        )
+      }
+      <span>{entry.data.category}</span>
+      <span>{entry.data.status}</span>
+      <span>{minutes} min read</span>
+      <TagList tags={entry.data.tags} label={`${entry.data.title} tags`} />
+    </section>
+
+    <div class="content-layout__body">
+      <aside class="content-layout__rail">
+        <TableOfContents headings={headings} />
+      </aside>
+      <div class="content-layout__prose" data-content-prose>
+        <slot />
+      </div>
+    </div>
+
+    <footer class="content-layout__footer">
+      <BackToTop />
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .content-layout {
+    padding-block: 2rem clamp(5rem, 10vw, 9rem);
+  }
+
+  .content-layout__header {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 58rem;
+    padding-block: clamp(3rem, 8vw, 7rem);
+  }
+
+  .content-layout__header > p {
+    margin: 0;
+  }
+
+  .content-layout__header h1 {
+    margin: 0;
+    font-size: clamp(var(--font-size-2xl), 7vw, 5.5rem);
+    font-weight: 550;
+    letter-spacing: -0.07em;
+    line-height: 0.92;
+  }
+
+  .content-layout__metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.25rem;
+    align-items: center;
+    padding-block: 1.25rem;
+    border-block: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.04em;
+  }
+
+  .content-layout__metadata :global(.tag-list) {
+    margin-inline-start: auto;
+  }
+
+  .content-layout__body {
+    display: grid;
+    grid-template-columns: minmax(10rem, 0.36fr) minmax(0, 1fr);
+    gap: clamp(2rem, 8vw, 8rem);
+    align-items: start;
+    padding-block-start: clamp(3rem, 7vw, 6rem);
+  }
+
+  .content-layout__rail {
+    position: sticky;
+    top: calc(var(--site-header-height) + 2rem);
+  }
+
+  .content-layout__prose {
+    width: min(100%, var(--reading-width));
+  }
+
+  .content-layout__prose :global(h2) {
+    margin: clamp(3.5rem, 7vw, 6rem) 0 1.25rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--color-border);
+    font-size: var(--font-size-lg);
+    font-weight: 540;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+  }
+
+  .content-layout__prose :global(h2:first-child) {
+    margin-block-start: 0;
+  }
+
+  .content-layout__prose :global(h3) {
+    margin: 2.5rem 0 1rem;
+    font-size: var(--font-size-md);
+    line-height: 1.25;
+  }
+
+  .content-layout__prose :global(p),
+  .content-layout__prose :global(li) {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-md);
+    line-height: 1.65;
+  }
+
+  .content-layout__prose :global(p) {
+    margin: 0;
+  }
+
+  .content-layout__prose :global(p + p) {
+    margin-block-start: 1.5rem;
+  }
+
+  .content-layout__prose :global(ul),
+  .content-layout__prose :global(ol) {
+    padding-inline-start: 1.25rem;
+  }
+
+  .content-layout__prose :global(img),
+  .content-layout__prose :global(video),
+  .content-layout__prose :global(pre),
+  .content-layout__prose :global(table) {
+    max-width: 100%;
+    margin-block: 2rem;
+  }
+
+  .content-layout__prose :global(pre),
+  .content-layout__prose :global(table) {
+    overflow-x: auto;
+  }
+
+  .content-layout__footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-block-start: clamp(4rem, 8vw, 7rem);
+  }
+
+  @media (max-width: 56rem) {
+    .content-layout__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .content-layout__rail {
+      position: static;
+    }
+
+    .content-layout__metadata :global(.tag-list) {
+      width: 100%;
+      margin-inline-start: 0;
+    }
+  }
+</style>
