@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+const directWorkReferences = (page: import("@playwright/test").Page) =>
+  page.locator("[href], [src]").evaluateAll((elements) =>
+    elements
+      .flatMap((element) =>
+        ["href", "src"].map((attribute) => element.getAttribute(attribute)),
+      )
+      .filter((reference) => {
+        if (!reference?.startsWith("/work/")) return false;
+        return new URL(reference, window.location.href).pathname === "/work/";
+      }),
+  );
+
 test("serves pages, assets, and feeds beneath the GitHub Pages base path", async ({
   page,
 }) => {
@@ -66,22 +78,20 @@ test("does not emit direct local /work/ references in generated pages", async ({
     const response = await page.goto(route);
     expect(response?.ok()).toBe(true);
 
-    const directWorkReferences = await page
-      .locator("[href], [src]")
-      .evaluateAll((elements) =>
-        elements
-          .map(
-            (element) =>
-              element.getAttribute("href") ?? element.getAttribute("src"),
-          )
-          .filter((reference) => {
-            if (!reference?.startsWith("/work/")) return false;
-            return (
-              new URL(reference, window.location.href).pathname === "/work/"
-            );
-          }),
-      );
-
-    expect(directWorkReferences).toEqual([]);
+    expect(await directWorkReferences(page)).toEqual([]);
   }
+});
+
+test("checks href and src independently when an element has both", async ({
+  page,
+}) => {
+  await page.goto("./");
+  await page.evaluate(() => {
+    const element = document.createElement("a");
+    element.setAttribute("href", "/BashAILabBlog/work/");
+    element.setAttribute("src", "/work/");
+    document.body.append(element);
+  });
+
+  await expect(directWorkReferences(page)).resolves.toEqual(["/work/"]);
 });

@@ -125,8 +125,9 @@ const serializedJsonLd = JSON.stringify(jsonLdEntries).replaceAll(
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <SiteHeader lang={lang} translationPath={translationPath} />
-    <main id="main-content">
+    <main id="main-content" tabindex="-1">
       <slot />
     </main>
     <SiteFooter lang={lang} />
@@ -134,6 +135,22 @@ const serializedJsonLd = JSON.stringify(jsonLdEntries).replaceAll(
 </html>
 
 <style>
+  .skip-link {
+    position: fixed;
+    z-index: 100;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-text);
+    color: var(--color-background);
+    text-decoration: none;
+    transform: translateY(-150%);
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
   main {
     padding-block-start: var(--site-header-height);
   }
