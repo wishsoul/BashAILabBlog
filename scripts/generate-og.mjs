@@ -25,7 +25,7 @@ try {
             position: relative;
             overflow: hidden;
             background: #f5f5f1;
-            color: #151513;
+            color: #111111;
             font-family: Arial, Helvetica, sans-serif;
           }
           .frame {
@@ -34,10 +34,10 @@ try {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border: 1px solid #d6d4cb;
+            border: 1px solid rgb(0 0 0 / 10%);
             padding: 34px 38px;
           }
-          .grid-line { position: absolute; background: #d6d4cb; }
+          .grid-line { position: absolute; background: rgb(0 0 0 / 10%); }
           .grid-line.vertical { top: 0; right: 174px; width: 1px; height: 100%; }
           .grid-line.horizontal { right: 0; bottom: 144px; width: 100%; height: 1px; }
           .orb {
@@ -46,7 +46,7 @@ try {
             bottom: 78px;
             width: 238px;
             height: 238px;
-            border: 1px solid #ff4d00;
+            border: 1px solid #5B5CFF;
             border-radius: 50%;
           }
           .orbit {
@@ -55,13 +55,13 @@ try {
             bottom: 156px;
             width: 356px;
             height: 1px;
-            background: #ff4d00;
+            background: #5B5CFF;
             transform: rotate(-31deg);
             transform-origin: right center;
           }
           .eyebrow, .footer {
             margin: 0;
-            color: #5f5e57;
+            color: #686868;
             font-family: "Courier New", monospace;
             font-size: 18px;
             letter-spacing: 0.13em;
@@ -75,7 +75,7 @@ try {
             letter-spacing: -0.085em;
             line-height: 0.83;
           }
-          h1 span { color: #ff4d00; }
+          h1 span { color: #5B5CFF; }
           .footer { display: flex; justify-content: space-between; gap: 24px; }
         </style>
       </head>
