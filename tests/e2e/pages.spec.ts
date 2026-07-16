@@ -9,13 +9,13 @@ test("renders the Log chronologically with semantic dates", async ({
     page.getByRole("heading", { level: 1, name: "Log" }),
   ).toBeVisible();
   await expect(page.locator("[data-log-entry]")).toHaveCount(3);
-  await expect(page.locator("[data-log-date]").first()).toHaveAttribute(
+  await expect(page.locator("time[data-log-date]").first()).toHaveAttribute(
     "datetime",
     "2026-07-15",
   );
   expect(
     await page
-      .locator("[data-log-date]")
+      .locator("time[data-log-date]")
       .evaluateAll((dates) =>
         dates.map((date) => date.getAttribute("datetime")),
       ),
@@ -77,6 +77,12 @@ test("renders the Chinese preparation status without translated content", async 
       "经过审核的中文内容将在准备完成后发布。你现在仍可访问完整的英文版。",
     ),
   ).toBeVisible();
+  const editionStatus = page.locator("main .edition-status");
+  await expect(editionStatus.locator("h1, h2, h3, h4, h5, h6")).toHaveCount(1);
+  await expect(editionStatus.locator("p")).toHaveCount(2);
+  await expect(
+    editionStatus.locator("[data-page-content], ul, ol"),
+  ).toHaveCount(0);
   await expect(page.getByRole("link", { name: "访问英文版" })).toHaveAttribute(
     "href",
     "/BashAILabBlog/",
