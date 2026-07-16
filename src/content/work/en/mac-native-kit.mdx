@@ -2,58 +2,180 @@
 title: MacNativeKit
 translationKey: work.mac-native-kit
 lang: en
-description: Constraint runtime for AI-generated native macOS interfaces.
-year: null
-startedAt: null
+description: Let AI describe native macOS UI intent without giving it unrestricted control over SwiftUI.
+year: 2026
+startedAt: 2026-06
 status: Active
 category: Infrastructure
 featured: true
 draft: false
-tags: [AI UI, SwiftUI, AppKit, Design System, DSL, Runtime, Validator, Codegen]
+tags:
+  [
+    AI UI,
+    SwiftUI,
+    AppKit,
+    Design System,
+    DSL,
+    Runtime,
+    Validator,
+    Prompt Generator,
+  ]
 platform: macOS
 role: Product strategy, system design, and implementation
 order: 1
 seo:
   title: MacNativeKit — Bash AI Lab
-  description: A constraint runtime, design token, validation, and code generation system for AI-generated native macOS interfaces.
+  description: A constrained native macOS UI runtime that uses a DSL, component contracts, design tokens, validation, and native rendering to keep AI-generated interfaces consistent.
+---
+
 ---
 
 ## Problem
 
-AI-generated native macOS interfaces need explicit constraints if their design and implementation are to remain consistent.
+AI can generate SwiftUI and AppKit code quickly, but code that compiles is not necessarily code that remains consistent and maintainable.
+
+In a real macOS project, an AI agent may bypass existing components, recreate native controls, introduce hard-coded styling, or apply web-oriented interface patterns to a desktop application. As the product grows, individual screens can begin to look unrelated, while architectural and platform boundaries gradually break down.
+
+The core problem is not that AI cannot write code. The problem is that AI lacks explicit, enforceable, and verifiable engineering constraints.
 
 ## Insight
 
-Rules, design tokens, validation, and code generation can make interface constraints part of the system instead of leaving them as informal guidance.
+Natural-language instructions inside a prompt are not sufficient to control the long-term behavior of an AI coding agent.
+
+When component availability, argument types, design tokens, rendering rules, and forbidden implementation patterns are defined as part of the system, interface constraints become executable contracts rather than informal guidance.
+
+The AI should describe interface intent without directly controlling SwiftUI or AppKit implementation details.
 
 ## Product Strategy
 
-MacNativeKit is framed as infrastructure for constrained native interface generation rather than as a single application-specific UI layer.
+MacNativeKit is positioned as native macOS UI infrastructure for AI agents rather than as an application-specific component library.
+
+It establishes a controlled boundary between AI-generated intent and native interface code:
+
+```text
+AI Agent
+→ MacNativeKit DSL
+→ Parser
+→ Component Schema Validation
+→ Native Renderer
+→ SwiftUI / AppKit-backed macOS UI
+```
+
+The agent can use only registered components. The runtime parses, validates, and renders the declaration, while the consuming application still receives a real native macOS interface.
 
 ## Solution
 
-The system is defined around a constrained DSL, runtime, design tokens, validation, and code generation for native macOS interfaces.
+MacNativeKit uses a constrained DSL as the interface declaration layer and is organized around the following system components:
+
+- A DSL lexer, parser, and AST;
+- Component schemas and a native component registry;
+- Agent prompts generated from registered component schemas;
+- Argument count and type validation;
+- A native SwiftUI renderer;
+- Shared spacing, typography, layout, and control design tokens;
+- Platform boundaries for materials and AppKit shells;
+- Forbidden-pattern checks and agent development policies;
+- A PastePop settings reference implemented with the DSL.
+
+Agents are not allowed to output arbitrary SwiftUI, AppKit, HTML, CSS, JSON UI, unregistered components, or unrestricted platform code.
+
+The current v0.1 release validates the minimum vertical path from a DSL declaration to a rendered native settings interface.
 
 ## AI / Technical Approach
 
-The declared technical scope includes SwiftUI, AppKit, a DSL, runtime behavior, validators, and code generation. This launch profile does not claim a public repository or demo.
+The project is implemented with Swift, SwiftUI, AppKit, and Swift Package Manager, with no third-party Swift package dependencies.
+
+The current architecture is divided into focused modules:
+
+- `MacNativeKitLang` parses the constrained DSL;
+- `MacNativeKitSchema` defines component and argument contracts;
+- `MacNativeKitPrompt` generates agent instructions from registered schemas;
+- `MacNativeKitNativeLibrary` registers native macOS components;
+- `MacNativeKitRenderer` validates declarations and renders SwiftUI views;
+- `MacNativeKitDesign` owns shared design tokens;
+- `MacNativeKitMaterial` defines material capability boundaries;
+- `MacNativeKitShell` defines window, menu bar, and floating-panel boundaries.
+
+The current native settings component library includes:
+
+- `SettingsScene`
+- `SettingsSection`
+- `ToggleRow`
+- `ButtonRow`
+- `PickerRow`
+- `SliderRow`
+- `TextRow`
+- `FooterText`
+
+The prompt generator derives component signatures from the schema registry. A component becomes available to the agent only after it has been explicitly registered.
+
+The renderer does not evaluate arbitrary code and does not generate or inject Swift source. Unknown components, invalid argument types, and missing `root` declarations are rejected or exposed as developer-facing errors.
+
+The current release focuses on structural generation and constraint validation. Two-way application state, action bridges, production window management, menu bar behavior, floating panels, and complete macOS 26 material implementations remain planned work.
 
 ## My Role
 
-Product strategy, system design, and implementation.
+I defined the product strategy, problem framing, system architecture, DSL and component contracts, agent constraint model, technical approach, and core implementation.
+
+I also use PastePop as the first reference application to verify that a complete settings-page structure can be expressed as UI intent in the DSL and rendered into a native macOS interface by the runtime.
 
 ## Artifacts
 
-The initial profile identifies the system components. No public screenshots, repository link, demo, or downloadable artifact is claimed here.
+- An open-source Swift Package;
+- DSL parser and AST;
+- Component schema and validator;
+- Schema-driven prompt generator;
+- Native SwiftUI renderer;
+- Native macOS settings component library;
+- Shared design token modules;
+- Material and AppKit shell boundaries;
+- Agent policy and forbidden-pattern checks;
+- PastePop settings DSL reference;
+- Automated tests and architecture documentation.
+
+Repository:
+
+https://github.com/wishsoul/MacNativeKit
 
 ## Results
 
-No public quantitative result is claimed in this initial profile.
+MacNativeKit v0.1 delivers a compilable and testable minimum vertical runtime and validates the following pipeline:
+
+```text
+DSL
+→ Parser
+→ Schema Validation
+→ Reference Resolution
+→ Native SwiftUI Rendering
+```
+
+The PastePop settings reference can be parsed and structurally rendered through the MacNativeKit runtime using registered native settings components.
+
+The repository also includes automated tests and forbidden-pattern checks designed to prevent examples from bypassing the runtime, directly constructing AppKit shells, introducing unauthorized styling, or implementing settings pages outside the declared architecture.
+
+No public user, revenue, or production performance metrics are claimed for the current version.
 
 ## Learnings
 
-The documented premise is that explicit constraints can connect product intent, interface rules, and generated native software.
+The central challenge in AI-assisted software development is not only improving the model's ability to generate code. It is also creating system boundaries that the model cannot silently bypass.
+
+A component schema can simultaneously serve as agent documentation, a runtime validation contract, a native rendering entry point, and a source of automated tests. Compared with maintaining a handwritten prompt, this schema-driven approach is more likely to keep the agent's declared capabilities synchronized with the real implementation.
+
+MacNativeKit also validates a broader architectural principle:
+
+> AI does not need to write the interface implementation directly for the final product to contain real, consistent, and maintainable native UI.
 
 ## Next Step
 
-A verified next-step update has not been supplied for this launch profile.
+The next phase will focus on:
+
+- Two-way application state binding;
+- Declarative action and event bridges;
+- Stronger component-family and hierarchy constraints;
+- Production-ready macOS 26 materials;
+- Settings window, menu bar, and floating-panel shells;
+- Global shortcuts and platform event bridges;
+- Additional form, list, sidebar, and toolbar components;
+- Streaming DSL parsing and incremental rendering;
+- Integration with the production PastePop application;
+- Evolving the structural prototype into a constrained UI runtime suitable for production applications.

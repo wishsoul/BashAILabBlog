@@ -119,8 +119,10 @@ test("builds all four project routes and renders the approved case-study sequenc
   await expect(metadata).toContainText(
     "Product strategy, system design, and implementation",
   );
-  await expect(metadata.getByText("Year", { exact: true })).toHaveCount(0);
-  await expect(metadata.getByText("Started", { exact: true })).toHaveCount(0);
+  await expect(metadata.getByText("Year", { exact: true })).toBeVisible();
+  await expect(metadata.getByText("2026", { exact: true })).toBeVisible();
+  await expect(metadata.getByText("Started", { exact: true })).toBeVisible();
+  await expect(metadata.getByText("June 2026", { exact: true })).toBeVisible();
   await expect(page.locator("[data-project-actions]")).toHaveCount(0);
 
   await expect(page.locator("[data-project-case-study] h2")).toHaveText([

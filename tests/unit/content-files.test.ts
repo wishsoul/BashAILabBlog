@@ -28,12 +28,23 @@ describe("launch content files", () => {
 
       expect(source).toMatch(/^lang: en$/mu);
       expect(source).toMatch(/^draft: false$/mu);
-      expect(source).toMatch(/^year: null$/mu);
-      expect(source).toMatch(/^startedAt: null$/mu);
+      expect(source).toMatch(
+        file === "mac-native-kit.mdx" ? /^year: 2026$/mu : /^year: null$/mu,
+      );
+      expect(source).toMatch(
+        file === "mac-native-kit.mdx"
+          ? /^startedAt: 2026-06$/mu
+          : /^startedAt: null$/mu,
+      );
       expect(source).toMatch(
         file === "mac-native-kit.mdx"
           ? /^role: Product strategy, system design, and implementation$/mu
           : /^role: Role details not yet supplied$/mu,
+      );
+      expect(source).toMatch(
+        file === "mac-native-kit.mdx"
+          ? /^description: Let AI describe native macOS UI intent without giving it unrestricted control over SwiftUI\.$/mu
+          : /^description: .+$/mu,
       );
       expect(source).not.toMatch(/^cover:/mu);
       expect(source).not.toMatch(percentageClaimPattern);

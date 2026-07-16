@@ -1,0 +1,181 @@
+---
+title: MacNativeKit
+translationKey: work.mac-native-kit
+lang: zh
+description: 让 AI 描述原生 macOS UI 意图，而不是不受约束地编写 SwiftUI。
+year: 2026
+startedAt: 2026-06
+status: Active
+category: Infrastructure
+featured: true
+draft: false
+tags:
+  [
+    AI UI,
+    SwiftUI,
+    AppKit,
+    Design System,
+    DSL,
+    Runtime,
+    Validator,
+    Prompt Generator,
+  ]
+platform: macOS
+role: 产品策略、系统设计与实现
+order: 1
+seo:
+  title: MacNativeKit — Bash AI Lab
+  description: 面向 AI Agent 的原生 macOS UI 约束运行时，通过 DSL、组件契约、设计令牌、验证器和原生渲染保证生成界面的一致性。
+---
+
+---
+
+## 问题
+
+AI 已经能够快速生成 SwiftUI 和 AppKit 代码，但“能够编译”并不意味着“能够长期维护”。
+
+在真实的 macOS 项目中，AI 容易绕过已有组件、重复实现原生控件、写入大量硬编码样式，或者将 Web UI 的设计习惯带入桌面应用。随着页面和功能增加，同一个项目中的界面可能逐渐失去一致性，技术边界也容易被破坏。
+
+问题的核心不是 AI 不会写代码，而是 AI 缺少明确、可执行和可验证的工程约束。
+
+## 洞察
+
+只依赖 Prompt 中的文字规则，无法稳定约束 AI 的长期行为。
+
+如果将组件范围、参数类型、设计令牌、渲染规则和禁止模式直接定义在系统中，UI 规范就不再只是非正式的开发建议，而会成为可以被解析、验证、测试和执行的工程契约。
+
+AI 不需要直接控制 SwiftUI 和 AppKit，而应该只负责表达 UI 意图。
+
+## 产品策略
+
+MacNativeKit 被定位为面向 AI Agent 的原生 macOS UI 基础设施，而不是某一个应用专用的组件库。
+
+它的目标是在 AI 和原生界面代码之间建立一个受控边界：
+
+```text
+AI Agent
+→ MacNativeKit DSL
+→ Parser
+→ Component Schema Validation
+→ Native Renderer
+→ SwiftUI / AppKit-backed macOS UI
+```
+
+AI 只能使用已经注册的组件，Runtime 负责解析、验证和渲染，业务应用最终仍然获得真实的 SwiftUI 和 AppKit 界面。
+
+## 解决方案
+
+MacNativeKit 以受约束的 DSL 为界面描述入口，并围绕以下模块构建：
+
+- DSL Lexer、Parser 和 AST；
+- 组件 Schema 与原生组件注册表；
+- 基于组件 Schema 自动生成的 Agent Prompt；
+- 参数数量和参数类型验证；
+- 原生 SwiftUI Renderer；
+- 统一的间距、字体、布局和控件 Design Token；
+- Material 与 AppKit Shell 的平台能力边界；
+- 禁止模式扫描和 Agent 开发策略；
+- 基于真实应用 PastePop 的设置页参考实现。
+
+AI 不允许直接输出 SwiftUI、AppKit、HTML、CSS、JSON UI、未注册组件或任意平台代码。
+
+当前 v0.1 已经跑通从 DSL 输入到原生设置界面渲染的最小垂直闭环。
+
+## AI / 技术方案
+
+项目采用 Swift、SwiftUI、AppKit 和 Swift Package Manager 实现，并且不依赖第三方 Swift Package。
+
+当前架构由多个独立模块组成：
+
+- `MacNativeKitLang`：解析受约束 DSL；
+- `MacNativeKitSchema`：定义组件和参数契约；
+- `MacNativeKitPrompt`：根据组件注册表生成 Agent Prompt；
+- `MacNativeKitNativeLibrary`：注册原生 macOS 组件；
+- `MacNativeKitRenderer`：验证并渲染 SwiftUI 界面；
+- `MacNativeKitDesign`：管理 Design Token；
+- `MacNativeKitMaterial`：定义材质能力边界；
+- `MacNativeKitShell`：定义窗口、菜单栏和浮动面板边界。
+
+当前原生设置组件包括：
+
+- `SettingsScene`
+- `SettingsSection`
+- `ToggleRow`
+- `ButtonRow`
+- `PickerRow`
+- `SliderRow`
+- `TextRow`
+- `FooterText`
+
+Prompt Generator 会从组件 Schema 中生成可用组件签名。一个组件只有在完成注册后，才会进入 AI 的能力范围。
+
+Renderer 不执行任意代码，也不会生成或注入 Swift 源码。未知组件、错误参数类型和缺少 `root` 等问题会在运行时被明确拒绝或转换为开发错误。
+
+当前版本主要验证结构生成与约束闭环。业务状态双向绑定、Action Bridge、生产级窗口管理、菜单栏、浮动面板和完整 macOS 26 材质仍在后续规划中。
+
+## 我的角色
+
+负责项目的产品策略、问题定义、系统架构、DSL 与组件契约设计、AI Agent 约束机制、技术方案制定、核心模块实现和真实业务验证。
+
+同时使用 PastePop 作为参考应用，验证设置页面能否只通过 DSL 表达 UI 意图，并由 Runtime 输出原生 macOS 界面。
+
+## 产出物
+
+- 开源 Swift Package；
+- DSL Parser 和 AST；
+- 组件 Schema 与 Validator；
+- Schema 驱动的 Prompt Generator；
+- 原生 SwiftUI Renderer；
+- macOS 设置页组件库；
+- Design Token 模块；
+- Material 和 AppKit Shell 边界；
+- Agent Policy 与禁止模式扫描脚本；
+- PastePop Settings DSL 参考实现；
+- 自动化测试与架构文档。
+
+项目仓库：
+
+https://github.com/wishsoul/MacNativeKit
+
+## 结果
+
+v0.1 已经完成一个可编译、可测试的最小垂直运行时，并验证了以下链路：
+
+```text
+DSL
+→ Parser
+→ Schema Validation
+→ Reference Resolution
+→ Native SwiftUI Rendering
+```
+
+PastePop 设置页参考 DSL 已经可以通过 MacNativeKit Renderer 完成结构解析和原生界面渲染。
+
+项目同时建立了自动化测试和禁止模式检查，用于阻止示例代码绕过 Runtime、直接创建 AppKit Shell、使用未授权样式或重新实现设置页面。
+
+当前版本尚未公布用户量、商业收入或性能类量化结果。
+
+## 收获
+
+AI 软件开发的关键问题，不只是提升模型生成代码的能力，还需要建立模型不能绕过的系统边界。
+
+组件 Schema 可以同时承担 AI 使用说明、Runtime 验证规则、原生渲染入口和测试依据。相比长期维护人工 Prompt，这种 Schema 驱动的方式更容易保持 AI 能力描述与真实代码实现同步。
+
+MacNativeKit 也验证了一个重要方向：
+
+> AI 不直接编写界面实现，但最终产品仍然可以拥有真实、统一且可维护的原生界面。
+
+## 下一步
+
+下一阶段将重点完善：
+
+- 业务状态双向绑定；
+- 声明式 Action 和 Event Bridge；
+- 更严格的组件层级与组件族约束；
+- 生产级 macOS 26 Material；
+- Settings Window、Menu Bar 和 Floating Panel Shell；
+- 全局快捷键与平台事件桥接；
+- 更完整的表单、列表、侧边栏和工具栏组件；
+- 流式 DSL 解析和增量渲染；
+- PastePop 真实工程接入；
+- 从结构验证原型推进到可用于生产应用的受约束 UI Runtime。
