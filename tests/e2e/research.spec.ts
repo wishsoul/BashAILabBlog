@@ -75,7 +75,7 @@ test("publishes the Chinese Research archive with reciprocal archive switches", 
   await expect(
     page.getByRole("heading", { level: 1, name: "研究" }),
   ).toBeVisible();
-  await expect(page.locator("[data-research-article]")).toHaveCount(0);
+  await expect(page.locator("[data-research-article]")).toHaveCount(3);
   await expect(
     page.getByRole("link", { name: "Switch to English" }).first(),
   ).toHaveAttribute("href", "/BashAILabBlog/research/");
