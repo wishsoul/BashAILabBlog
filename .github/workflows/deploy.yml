@@ -28,7 +28,7 @@ jobs:
       - run: npm run test
       - run: npm run build
         env:
-          PUBLIC_SITE_URL: https://bashxu.github.io
+          PUBLIC_SITE_URL: https://wishsoul.github.io
           PUBLIC_BASE_PATH: /BashAILabBlog
       - run: npm run test:links
       - uses: actions/upload-pages-artifact@v3

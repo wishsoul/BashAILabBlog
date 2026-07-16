@@ -56,12 +56,12 @@ Do not publish machine-generated or placeholder translations. When reviewed Chin
 
 ## Configuration, themes, and assets
 
-| Variable             | Default                    | Purpose                                                             |
-| -------------------- | -------------------------- | ------------------------------------------------------------------- |
-| `PUBLIC_SITE_URL`    | `https://bashxu.github.io` | Canonical-origin, sitemap, and feed origin.                         |
-| `PUBLIC_BASE_PATH`   | `/BashAILabBlog`           | Deployment subpath used by Astro and base-safe internal URLs.       |
-| `PUBLIC_EMAIL`       | empty                      | Optional public email address; an empty value hides the email link. |
-| `PUBLIC_RESUME_PATH` | empty                      | Optional base-relative path to a supplied downloadable resume.      |
+| Variable             | Default                      | Purpose                                                             |
+| -------------------- | ---------------------------- | ------------------------------------------------------------------- |
+| `PUBLIC_SITE_URL`    | `https://wishsoul.github.io` | Canonical-origin, sitemap, and feed origin.                         |
+| `PUBLIC_BASE_PATH`   | `/BashAILabBlog`             | Deployment subpath used by Astro and base-safe internal URLs.       |
+| `PUBLIC_EMAIL`       | empty                        | Optional public email address; an empty value hides the email link. |
+| `PUBLIC_RESUME_PATH` | empty                        | Optional base-relative path to a supplied downloadable resume.      |
 
 Theme tokens live in `src/styles/global.css`. The light/dark `--color-background`, `--color-surface`, `--color-text`, `--color-text-secondary`, `--color-border`, and `--color-accent` tokens are the contrast-critical palette. Typography, gutters, page width, and the `--reading-width` measure live beside them. Preserve the reduced-motion media query and validate any token change with the accessibility journeys.
 
@@ -94,7 +94,7 @@ npm run lint
 npm run check
 npm run audit:production
 npm run test
-PUBLIC_SITE_URL=https://bashxu.github.io PUBLIC_BASE_PATH=/BashAILabBlog npm run build
+PUBLIC_SITE_URL=https://wishsoul.github.io PUBLIC_BASE_PATH=/BashAILabBlog npm run build
 npm run test:links
 git diff --check
 ```
@@ -106,11 +106,11 @@ The workflow in `.github/workflows/deploy.yml` builds and deploys on pushes to `
 For the configured project site, the Pages build environment is:
 
 ```text
-PUBLIC_SITE_URL=https://bashxu.github.io
+PUBLIC_SITE_URL=https://wishsoul.github.io
 PUBLIC_BASE_PATH=/BashAILabBlog
 ```
 
-The expected Pages URL is `https://bashxu.github.io/BashAILabBlog/`. The deploy job exposes the actual deployment URL in the GitHub Actions environment after a successful run.
+The expected Pages URL is `https://wishsoul.github.io/BashAILabBlog/`. The deploy job exposes the actual deployment URL in the GitHub Actions environment after a successful run.
 
 ### Optional custom domain
 

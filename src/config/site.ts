@@ -5,7 +5,7 @@ export const SITE = {
   title: "Bash AI Lab — AI Product Research & Independent Software",
   description:
     "AI product research, agentic development systems and independent software built by Bash.",
-  siteUrl: import.meta.env.PUBLIC_SITE_URL ?? "https://bashxu.github.io",
+  siteUrl: import.meta.env.PUBLIC_SITE_URL ?? "https://wishsoul.github.io",
   basePath: import.meta.env.PUBLIC_BASE_PATH ?? "/BashAILabBlog",
   defaultLocale: "en" as const,
   locales: ["en", "zh"] as const,
