@@ -114,6 +114,6 @@ test("marks Research current on archive and nested article routes", async ({
   await page.goto("./research/");
   await expect(researchLink).toHaveAttribute("aria-current", "page");
 
-  await page.goto("./research/agentic-development/");
+  await page.goto("./research/from-l3-to-l4-agentic-development/");
   await expect(researchLink).toHaveAttribute("aria-current", "page");
 });

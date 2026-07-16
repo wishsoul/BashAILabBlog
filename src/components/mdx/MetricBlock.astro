@@ -11,9 +11,9 @@ const { label, value, detail } = Astro.props;
 <dl class="metric-block">
   <div>
     <dt>{label}</dt>
-    <dd>{value}</dd>
+    <dd class="metric-block__value">{value}</dd>
+    {detail && <dd class="metric-block__detail">{detail}</dd>}
   </div>
-  {detail && <p>{detail}</p>}
 </dl>
 
 <style>
@@ -38,7 +38,7 @@ const { label, value, detail } = Astro.props;
     text-transform: uppercase;
   }
 
-  .metric-block dd {
+  .metric-block__value {
     margin: 0;
     font-size: var(--font-size-xl);
     font-weight: 540;
@@ -46,7 +46,7 @@ const { label, value, detail } = Astro.props;
     line-height: 1;
   }
 
-  .metric-block p {
+  .metric-block__detail {
     margin: 0;
     color: var(--color-text-secondary);
     font-size: var(--font-size-sm);
