@@ -36,6 +36,21 @@ afterEach(async () => {
 });
 
 describe("translation-pair validation", () => {
+  it("accepts the repository content inventory", () => {
+    const entries = collectTranslationEntries(
+      new URL("../../src/content/", import.meta.url),
+    );
+    const englishKeys = entries
+      .filter((entry) => entry.lang === "en")
+      .map((entry) => entry.translationKey)
+      .sort();
+    const chineseKeys = entries
+      .filter((entry) => entry.lang === "zh")
+      .map((entry) => entry.translationKey)
+      .sort();
+    expect(chineseKeys).toEqual(englishKeys);
+  });
+
   it("collects parsed entries synchronously from a content directory", async () => {
     const directory = await createContentFixture({
       "work/en/demo.mdx": "---\nlang: en\ntranslationKey: work.demo\n---\n",

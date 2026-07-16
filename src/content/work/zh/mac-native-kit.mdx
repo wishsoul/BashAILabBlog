@@ -2,55 +2,45 @@
 title: MacNativeKit
 translationKey: work.mac-native-kit
 lang: zh
-description: 让 AI 描述原生 macOS UI 意图，而不是不受约束地编写 SwiftUI。
+description: 让 AI 描述原生 macOS UI 意图，而不是不受限制地控制 SwiftUI。
 year: 2026
 startedAt: 2026-06
 status: Active
 category: Infrastructure
 featured: true
 draft: false
-tags:
-  [
-    AI UI,
-    SwiftUI,
-    AppKit,
-    Design System,
-    DSL,
-    Runtime,
-    Validator,
-    Prompt Generator,
-  ]
+tags: [AI UI, SwiftUI, AppKit, 设计系统, DSL, 运行时, 验证器, 提示词生成器]
 platform: macOS
-role: 产品策略、系统设计与实现
+role: 产品策略、系统设计和实现
 order: 1
 seo:
   title: MacNativeKit — Bash AI Lab
-  description: 面向 AI Agent 的原生 macOS UI 约束运行时，通过 DSL、组件契约、设计令牌、验证器和原生渲染保证生成界面的一致性。
+  description: 使用 DSL、组件契约、设计令牌、验证和原生渲染的受约束原生 macOS UI 运行时，以保持 AI 生成界面的一致性。
 ---
 
 ---
 
 ## 问题
 
-AI 已经能够快速生成 SwiftUI 和 AppKit 代码，但“能够编译”并不意味着“能够长期维护”。
+AI 可以快速生成 SwiftUI 和 AppKit 代码，但能够编译的代码未必能保持一致并可维护。
 
-在真实的 macOS 项目中，AI 容易绕过已有组件、重复实现原生控件、写入大量硬编码样式，或者将 Web UI 的设计习惯带入桌面应用。随着页面和功能增加，同一个项目中的界面可能逐渐失去一致性，技术边界也容易被破坏。
+在真实的 macOS 项目中，AI 智能体可能绕过已有组件、重新创建原生控件、引入硬编码样式，或将偏向 Web 的界面模式应用于桌面应用。随着产品增长，单个页面可能开始显得彼此无关，而架构与平台边界会逐步瓦解。
 
-问题的核心不是 AI 不会写代码，而是 AI 缺少明确、可执行和可验证的工程约束。
+核心问题不是 AI 无法编写代码，而是 AI 缺少明确、可强制执行且可验证的工程约束。
 
 ## 洞察
 
-只依赖 Prompt 中的文字规则，无法稳定约束 AI 的长期行为。
+提示词中的自然语言指令不足以控制 AI 编程智能体的长期行为。
 
-如果将组件范围、参数类型、设计令牌、渲染规则和禁止模式直接定义在系统中，UI 规范就不再只是非正式的开发建议，而会成为可以被解析、验证、测试和执行的工程契约。
+当组件可用性、参数类型、设计令牌、渲染规则和禁止的实现模式被定义为系统的一部分时，界面约束就成为可执行的契约，而不是非正式的指引。
 
-AI 不需要直接控制 SwiftUI 和 AppKit，而应该只负责表达 UI 意图。
+AI 应当描述界面意图，而不直接控制 SwiftUI 或 AppKit 的实现细节。
 
 ## 产品策略
 
-MacNativeKit 被定位为面向 AI Agent 的原生 macOS UI 基础设施，而不是某一个应用专用的组件库。
+MacNativeKit 被定位为面向 AI 智能体的原生 macOS UI 基础设施，而不是特定应用的组件库。
 
-它的目标是在 AI 和原生界面代码之间建立一个受控边界：
+它在 AI 生成的意图和原生界面代码之间建立受控边界：
 
 ```text
 AI Agent
@@ -61,42 +51,42 @@ AI Agent
 → SwiftUI / AppKit-backed macOS UI
 ```
 
-AI 只能使用已经注册的组件，Runtime 负责解析、验证和渲染，业务应用最终仍然获得真实的 SwiftUI 和 AppKit 界面。
+智能体只能使用已注册的组件。运行时解析、验证并渲染声明，而使用该系统的应用仍可获得真实的原生 macOS 界面。
 
 ## 解决方案
 
-MacNativeKit 以受约束的 DSL 为界面描述入口，并围绕以下模块构建：
+MacNativeKit 使用受约束的 DSL 作为界面声明层，并围绕以下系统组件组织：
 
-- DSL Lexer、Parser 和 AST；
-- 组件 Schema 与原生组件注册表；
-- 基于组件 Schema 自动生成的 Agent Prompt；
-- 参数数量和参数类型验证；
-- 原生 SwiftUI Renderer；
-- 统一的间距、字体、布局和控件 Design Token；
-- Material 与 AppKit Shell 的平台能力边界；
-- 禁止模式扫描和 Agent 开发策略；
-- 基于真实应用 PastePop 的设置页参考实现。
+- DSL 词法分析器、解析器和 AST；
+- 组件模式和原生组件注册表；
+- 从已注册组件模式生成的智能体提示词；
+- 参数数量和类型验证；
+- 原生 SwiftUI 渲染器；
+- 共享的间距、排版、布局和控件设计令牌；
+- 材质和 AppKit 外壳的平台边界；
+- 禁止模式检查和智能体开发策略；
+- 使用 DSL 实现的 PastePop 设置参考。
 
-AI 不允许直接输出 SwiftUI、AppKit、HTML、CSS、JSON UI、未注册组件或任意平台代码。
+不允许智能体输出任意的 SwiftUI、AppKit、HTML、CSS、JSON UI、未注册的组件或不受限制的平台代码。
 
-当前 v0.1 已经跑通从 DSL 输入到原生设置界面渲染的最小垂直闭环。
+当前 v0.1 版本验证了从 DSL 声明到渲染原生设置界面的最小垂直路径。
 
 ## AI / 技术方案
 
-项目采用 Swift、SwiftUI、AppKit 和 Swift Package Manager 实现，并且不依赖第三方 Swift Package。
+该项目使用 Swift、SwiftUI、AppKit 和 Swift Package Manager 实现，且不依赖第三方 Swift Package。
 
-当前架构由多个独立模块组成：
+当前架构分为聚焦的模块：
 
-- `MacNativeKitLang`：解析受约束 DSL；
-- `MacNativeKitSchema`：定义组件和参数契约；
-- `MacNativeKitPrompt`：根据组件注册表生成 Agent Prompt；
-- `MacNativeKitNativeLibrary`：注册原生 macOS 组件；
-- `MacNativeKitRenderer`：验证并渲染 SwiftUI 界面；
-- `MacNativeKitDesign`：管理 Design Token；
-- `MacNativeKitMaterial`：定义材质能力边界；
-- `MacNativeKitShell`：定义窗口、菜单栏和浮动面板边界。
+- `MacNativeKitLang` 解析受约束的 DSL；
+- `MacNativeKitSchema` 定义组件和参数契约；
+- `MacNativeKitPrompt` 从已注册的模式生成智能体指令；
+- `MacNativeKitNativeLibrary` 注册原生 macOS 组件；
+- `MacNativeKitRenderer` 验证声明并渲染 SwiftUI 视图；
+- `MacNativeKitDesign` 维护共享设计令牌；
+- `MacNativeKitMaterial` 定义材质能力边界；
+- `MacNativeKitShell` 定义窗口、菜单栏和浮动面板的边界。
 
-当前原生设置组件包括：
+当前原生设置组件库包括：
 
 - `SettingsScene`
 - `SettingsSection`
@@ -107,39 +97,39 @@ AI 不允许直接输出 SwiftUI、AppKit、HTML、CSS、JSON UI、未注册组�
 - `TextRow`
 - `FooterText`
 
-Prompt Generator 会从组件 Schema 中生成可用组件签名。一个组件只有在完成注册后，才会进入 AI 的能力范围。
+提示词生成器从模式注册表推导组件签名。组件只有在被明确注册后，才会对智能体可用。
 
-Renderer 不执行任意代码，也不会生成或注入 Swift 源码。未知组件、错误参数类型和缺少 `root` 等问题会在运行时被明确拒绝或转换为开发错误。
+渲染器不会求值任意代码，也不会生成或注入 Swift 源代码。未知组件、无效的参数类型和缺少 `root` 声明会被拒绝，或作为面向开发者的错误呈现。
 
-当前版本主要验证结构生成与约束闭环。业务状态双向绑定、Action Bridge、生产级窗口管理、菜单栏、浮动面板和完整 macOS 26 材质仍在后续规划中。
+当前版本聚焦于结构生成和约束验证。双向应用状态、操作桥接、生产级窗口管理、菜单栏行为、浮动面板以及完整的 macOS 26 材质实现仍是计划中的工作。
 
 ## 我的角色
 
-负责项目的产品策略、问题定义、系统架构、DSL 与组件契约设计、AI Agent 约束机制、技术方案制定、核心模块实现和真实业务验证。
+我定义了产品策略、问题框定、系统架构、DSL 和组件契约、智能体约束模型、技术方案及核心实现。
 
-同时使用 PastePop 作为参考应用，验证设置页面能否只通过 DSL 表达 UI 意图，并由 Runtime 输出原生 macOS 界面。
+我也将 PastePop 用作首个参考应用，以验证完整的设置页面结构能否在 DSL 中表达为 UI 意图，并由运行时渲染为原生 macOS 界面。
 
 ## 产出物
 
-- 开源 Swift Package；
-- DSL Parser 和 AST；
-- 组件 Schema 与 Validator；
-- Schema 驱动的 Prompt Generator；
-- 原生 SwiftUI Renderer；
-- macOS 设置页组件库；
-- Design Token 模块；
-- Material 和 AppKit Shell 边界；
-- Agent Policy 与禁止模式扫描脚本；
-- PastePop Settings DSL 参考实现；
-- 自动化测试与架构文档。
+- 一个开源 Swift Package；
+- DSL 解析器和 AST；
+- 组件模式和验证器；
+- 模式驱动的提示词生成器；
+- 原生 SwiftUI 渲染器；
+- 原生 macOS 设置组件库；
+- 共享设计令牌模块；
+- 材质和 AppKit 外壳边界；
+- 智能体策略和禁止模式检查；
+- PastePop 设置 DSL 参考；
+- 自动化测试和架构文档。
 
-项目仓库：
+仓库：
 
 https://github.com/wishsoul/MacNativeKit
 
 ## 结果
 
-v0.1 已经完成一个可编译、可测试的最小垂直运行时，并验证了以下链路：
+MacNativeKit v0.1 提供了可编译且可测试的最小垂直运行时，并验证了以下流水线：
 
 ```text
 DSL
@@ -149,33 +139,33 @@ DSL
 → Native SwiftUI Rendering
 ```
 
-PastePop 设置页参考 DSL 已经可以通过 MacNativeKit Renderer 完成结构解析和原生界面渲染。
+PastePop 设置参考可由 MacNativeKit 运行时解析，并使用已注册的原生设置组件进行结构渲染。
 
-项目同时建立了自动化测试和禁止模式检查，用于阻止示例代码绕过 Runtime、直接创建 AppKit Shell、使用未授权样式或重新实现设置页面。
+该仓库还包括自动化测试和禁止模式检查，旨在防止示例绕过运行时、直接构建 AppKit 外壳、引入未经授权的样式，或在已声明的架构之外实现设置页面。
 
-当前版本尚未公布用户量、商业收入或性能类量化结果。
+当前版本不主张任何公开的用户、收入或生产性能指标。
 
 ## 收获
 
-AI 软件开发的关键问题，不只是提升模型生成代码的能力，还需要建立模型不能绕过的系统边界。
+AI 辅助软件开发的核心挑战不仅是提升模型生成代码的能力，也在于创建模型无法悄然绕过的系统边界。
 
-组件 Schema 可以同时承担 AI 使用说明、Runtime 验证规则、原生渲染入口和测试依据。相比长期维护人工 Prompt，这种 Schema 驱动的方式更容易保持 AI 能力描述与真实代码实现同步。
+组件模式可以同时作为智能体文档、运行时验证契约、原生渲染入口和自动化测试的来源。相较于维护手写提示词，这种模式驱动的方法更有可能让智能体声明的能力与真实实现保持同步。
 
-MacNativeKit 也验证了一个重要方向：
+MacNativeKit 还验证了一项更广泛的架构原则：
 
-> AI 不直接编写界面实现，但最终产品仍然可以拥有真实、统一且可维护的原生界面。
+> AI 无需直接编写界面实现，最终产品仍能包含真实、一致且可维护的原生 UI。
 
 ## 下一步
 
-下一阶段将重点完善：
+下一阶段将聚焦于：
 
-- 业务状态双向绑定；
-- 声明式 Action 和 Event Bridge；
-- 更严格的组件层级与组件族约束；
-- 生产级 macOS 26 Material；
-- Settings Window、Menu Bar 和 Floating Panel Shell；
-- 全局快捷键与平台事件桥接；
-- 更完整的表单、列表、侧边栏和工具栏组件；
+- 双向应用状态绑定；
+- 声明式操作和事件桥接；
+- 更强的组件族和层级约束；
+- 生产就绪的 macOS 26 材质；
+- 设置窗口、菜单栏和浮动面板外壳；
+- 全局快捷键和平台事件桥接；
+- 更多表单、列表、侧边栏和工具栏组件；
 - 流式 DSL 解析和增量渲染；
-- PastePop 真实工程接入；
-- 从结构验证原型推进到可用于生产应用的受约束 UI Runtime。
+- 与生产环境 PastePop 应用的集成；
+- 将结构原型演进为适用于生产应用的受约束 UI 运行时。
