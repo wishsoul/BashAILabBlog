@@ -1,5 +1,5 @@
 import console from "node:console";
-import { readdir, readFile } from "node:fs/promises";
+import { readdirSync, readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import process from "node:process";
 import { URL, fileURLToPath, pathToFileURL } from "node:url";
@@ -53,24 +53,21 @@ export function validateTranslationPairs(entries) {
 
 /**
  * @param {URL} directory
- * @returns {Promise<URL[]>}
+ * @returns {URL[]}
  */
-async function walkMarkdownFiles(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
-  const files = await Promise.all(
-    entries
-      .sort((left, right) => left.name.localeCompare(right.name))
-      .map(async (entry) => {
-        const file = new URL(entry.name, directory);
-        if (entry.isDirectory())
-          return walkMarkdownFiles(new URL(`${entry.name}/`, directory));
-        return entry.isFile() &&
-          MARKDOWN_EXTENSIONS.has(entry.name.slice(entry.name.lastIndexOf(".")))
-          ? [file]
-          : [];
-      }),
-  );
-  return files.flat();
+function walkMarkdownFiles(directory) {
+  const entries = readdirSync(directory, { withFileTypes: true });
+  return entries
+    .sort((left, right) => left.name.localeCompare(right.name))
+    .flatMap((entry) => {
+      const file = new URL(entry.name, directory);
+      if (entry.isDirectory())
+        return walkMarkdownFiles(new URL(`${entry.name}/`, directory));
+      return entry.isFile() &&
+        MARKDOWN_EXTENSIONS.has(entry.name.slice(entry.name.lastIndexOf(".")))
+        ? [file]
+        : [];
+    });
 }
 
 /**
@@ -90,43 +87,37 @@ function scalar(frontMatter, name) {
 
 /**
  * @param {URL} contentRoot
- * @returns {Promise<TranslationEntry[]>}
+ * @returns {TranslationEntry[]}
  */
-export async function collectTranslationEntries(contentRoot) {
+export function collectTranslationEntries(contentRoot) {
   const rootPath = fileURLToPath(contentRoot);
-  const files = (
-    await Promise.all(
-      CONTENT_DIRECTORIES.map((directory) =>
-        walkMarkdownFiles(new URL(`${directory}/`, contentRoot)),
-      ),
-    )
-  ).flat();
-
-  const entries = await Promise.all(
-    files.map(async (file) => {
-      const content = await readFile(file, "utf8");
-      const frontMatter = content.match(FRONT_MATTER_PATTERN)?.[1];
-      if (!frontMatter) return undefined;
-
-      const lang = scalar(frontMatter, "lang");
-      const translationKey = scalar(frontMatter, "translationKey");
-      if ((lang !== "en" && lang !== "zh") || !translationKey) return undefined;
-
-      return {
-        file: relative(rootPath, fileURLToPath(file)).replaceAll("\\", "/"),
-        lang,
-        translationKey,
-      };
-    }),
+  const files = CONTENT_DIRECTORIES.flatMap((directory) =>
+    walkMarkdownFiles(new URL(`${directory}/`, contentRoot)),
   );
+
+  const entries = files.map((file) => {
+    const content = readFileSync(file, "utf8");
+    const frontMatter = content.match(FRONT_MATTER_PATTERN)?.[1];
+    if (!frontMatter) return undefined;
+
+    const lang = scalar(frontMatter, "lang");
+    const translationKey = scalar(frontMatter, "translationKey");
+    if ((lang !== "en" && lang !== "zh") || !translationKey) return undefined;
+
+    return {
+      file: relative(rootPath, fileURLToPath(file)).replaceAll("\\", "/"),
+      lang,
+      translationKey,
+    };
+  });
 
   return entries.filter((entry) => entry !== undefined);
 }
 
-async function main() {
+function main() {
   const contentRoot = new URL("../src/content/", import.meta.url);
   const errors = validateTranslationPairs(
-    await collectTranslationEntries(contentRoot),
+    collectTranslationEntries(contentRoot),
   );
   if (errors.length === 0) return;
 
@@ -138,8 +129,10 @@ if (
   process.argv[1] &&
   pathToFileURL(resolve(process.argv[1])).href === import.meta.url
 ) {
-  main().catch((error) => {
+  try {
+    main();
+  } catch (error) {
     console.error(error);
     process.exitCode = 1;
-  });
+  }
 }

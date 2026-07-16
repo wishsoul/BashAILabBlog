@@ -1,7 +1,62 @@
-import { describe, expect, it } from "vitest";
-import { validateTranslationPairs } from "../../scripts/check-translation-pairs.mjs";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+import { afterEach, describe, expect, it } from "vitest";
+import {
+  collectTranslationEntries,
+  validateTranslationPairs,
+} from "../../scripts/check-translation-pairs.mjs";
+
+const fixtureDirectories: string[] = [];
+
+async function createContentFixture(
+  files: Record<string, string>,
+): Promise<string> {
+  const directory = await mkdtemp(join(tmpdir(), "translation-pairs-"));
+  fixtureDirectories.push(directory);
+
+  await Promise.all(
+    Object.entries(files).map(async ([file, content]) => {
+      const target = join(directory, file);
+      await mkdir(join(target, ".."), { recursive: true });
+      await writeFile(target, content);
+    }),
+  );
+
+  return directory;
+}
+
+afterEach(async () => {
+  await Promise.all(
+    fixtureDirectories
+      .splice(0)
+      .map((directory) => rm(directory, { recursive: true, force: true })),
+  );
+});
 
 describe("translation-pair validation", () => {
+  it("collects parsed entries synchronously from a content directory", async () => {
+    const directory = await createContentFixture({
+      "work/en/demo.mdx": "---\nlang: en\ntranslationKey: work.demo\n---\n",
+      "work/zh/demo.md": "---\ntranslationKey: work.demo\nlang: zh\n---\n",
+      "research/.gitkeep": "",
+      "log/.gitkeep": "",
+      "pages/.gitkeep": "",
+    });
+
+    const entries = collectTranslationEntries(pathToFileURL(`${directory}/`));
+
+    expect(entries.filter((entry) => entry.lang === "zh")).toEqual([
+      { file: "work/zh/demo.md", lang: "zh", translationKey: "work.demo" },
+    ]);
+    expect(entries).toContainEqual({
+      file: "work/en/demo.mdx",
+      lang: "en",
+      translationKey: "work.demo",
+    });
+  });
+
   it("accepts one English source with one Chinese translation", () => {
     expect(
       validateTranslationPairs([
