@@ -1,0 +1,55 @@
+---
+import { getUi } from "../i18n";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/urls";
+
+const ui = getUi("en");
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The page you requested is not available."
+  lang="en"
+  canonicalPath="/404.html"
+>
+  <article class="site-frame not-found">
+    <p class="meta-label">404</p>
+    <h1 class="display-title">Page not found</h1>
+    <p class="lead">
+      The page you requested is not available. Return to the Bash AI Lab index.
+    </p>
+    <a class="not-found__link" href={withBase("/")}>{ui.cta.backHome}</a>
+  </article>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    align-content: center;
+    gap: 1.5rem;
+    min-height: 62svh;
+    max-width: var(--reading-width);
+    padding-block: clamp(5rem, 12vw, 10rem);
+  }
+
+  .not-found > p,
+  .not-found > h1 {
+    margin: 0;
+  }
+
+  .not-found__link {
+    width: fit-content;
+    min-height: 2.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  .not-found__link:hover {
+    border-color: var(--color-accent);
+  }
+</style>

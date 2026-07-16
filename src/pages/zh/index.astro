@@ -1,0 +1,56 @@
+---
+import { getUi } from "../../i18n";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { withBase } from "../../lib/urls";
+
+const ui = getUi("zh");
+---
+
+<BaseLayout
+  title={ui.editionStatus.title}
+  description={ui.editionStatus.description}
+  lang="zh"
+  canonicalPath="/zh/"
+  translationPath="/"
+>
+  <article class="site-frame edition-status">
+    <p class="meta-label">{ui.editionStatus.eyebrow}</p>
+    <h1 class="display-title">{ui.editionStatus.title}</h1>
+    <p class="lead">{ui.editionStatus.description}</p>
+    <a class="edition-status__link" href={withBase("/")}>
+      {ui.editionStatus.backToEnglish}
+    </a>
+  </article>
+</BaseLayout>
+
+<style>
+  .edition-status {
+    display: grid;
+    align-content: center;
+    gap: 1.5rem;
+    min-height: 62svh;
+    max-width: var(--reading-width);
+    padding-block: clamp(5rem, 12vw, 10rem);
+  }
+
+  .edition-status > p,
+  .edition-status > h1 {
+    margin: 0;
+  }
+
+  .edition-status__link {
+    width: fit-content;
+    min-height: 2.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  .edition-status__link:hover {
+    border-color: var(--color-accent);
+  }
+</style>

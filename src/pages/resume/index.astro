@@ -1,0 +1,85 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const entry = (await getCollection("pages")).find(
+  (page) => page.id === "en/resume" && !page.data.draft,
+);
+
+if (!entry) throw new Error("Missing approved Resume page content.");
+
+const { Content } = await render(entry);
+---
+
+<BaseLayout
+  title={entry.data.seo.title}
+  description={entry.data.seo.description}
+  lang="en"
+  canonicalPath="/resume/"
+>
+  <article class="site-frame editorial-page">
+    <header class="editorial-page__header">
+      <p class="meta-label">Bash AI Lab</p>
+      <h1 class="display-title">{entry.data.title}</h1>
+      <p class="lead">{entry.data.description}</p>
+    </header>
+
+    <div class="editorial-page__content" data-page-content>
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .editorial-page {
+    padding-block: clamp(4rem, 9vw, 8rem) clamp(5rem, 10vw, 9rem);
+  }
+
+  .editorial-page__header {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 58rem;
+    padding-block-end: clamp(3rem, 7vw, 6rem);
+  }
+
+  .editorial-page__header > p {
+    margin: 0;
+  }
+
+  .editorial-page__content {
+    width: min(100%, var(--reading-width));
+  }
+
+  .editorial-page__content :global(h2) {
+    margin: clamp(3.5rem, 7vw, 6rem) 0 1.25rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--color-border);
+    font-size: var(--font-size-lg);
+    font-weight: 540;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+  }
+
+  .editorial-page__content :global(h2:first-child) {
+    margin-block-start: 0;
+  }
+
+  .editorial-page__content :global(p),
+  .editorial-page__content :global(li) {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-md);
+    line-height: 1.65;
+  }
+
+  .editorial-page__content :global(p) {
+    margin: 0;
+  }
+
+  .editorial-page__content :global(p + p) {
+    margin-block-start: 1.5rem;
+  }
+
+  .editorial-page__content :global(ul) {
+    padding-inline-start: 1.25rem;
+  }
+</style>

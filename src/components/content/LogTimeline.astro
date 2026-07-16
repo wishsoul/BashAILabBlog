@@ -1,0 +1,113 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  entries: CollectionEntry<"log">[];
+}
+
+const { entries } = Astro.props;
+const groups = new Map<string, CollectionEntry<"log">[]>();
+
+for (const entry of entries) {
+  const date = entry.data.date.toISOString().slice(0, 10);
+  const group = groups.get(date) ?? [];
+  group.push(entry);
+  groups.set(date, group);
+}
+
+const timeline = [...groups.entries()];
+const formatDate = (date: Date) =>
+  [
+    date.getUTCFullYear(),
+    String(date.getUTCMonth() + 1).padStart(2, "0"),
+    String(date.getUTCDate()).padStart(2, "0"),
+  ].join(".");
+---
+
+<ol class="log-timeline" data-log-timeline>
+  {
+    timeline.map(([date, groupedEntries]) => (
+      <li class="log-timeline__group">
+        <time class="log-timeline__date" datetime={date} data-log-date>
+          {formatDate(groupedEntries[0].data.date)}
+        </time>
+        <ol class="log-timeline__entries">
+          {groupedEntries.map((entry) => (
+            <li>
+              <article class="log-timeline__entry" data-log-entry>
+                <p class="log-timeline__meta meta-label">{entry.data.type}</p>
+                <h2>{entry.data.title}</h2>
+                <p>{entry.data.summary}</p>
+              </article>
+            </li>
+          ))}
+        </ol>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .log-timeline,
+  .log-timeline__entries {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .log-timeline__group {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.32fr) minmax(0, 1fr);
+    gap: 2rem;
+    padding-block: clamp(2rem, 5vw, 4rem);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .log-timeline__group:first-child {
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .log-timeline__date {
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.04em;
+  }
+
+  .log-timeline__entries {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .log-timeline__entry {
+    display: grid;
+    gap: 0.75rem;
+    max-width: var(--reading-width);
+  }
+
+  .log-timeline__meta,
+  .log-timeline__entry > p {
+    margin: 0;
+  }
+
+  .log-timeline__entry > h2 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: 520;
+    letter-spacing: -0.035em;
+    line-height: 1.2;
+  }
+
+  .log-timeline__entry > p:not(.log-timeline__meta) {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-md);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 39.999rem) {
+    .log-timeline__group {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1rem;
+    }
+  }
+</style>

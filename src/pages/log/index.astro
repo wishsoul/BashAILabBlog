@@ -1,0 +1,48 @@
+---
+import { getCollection } from "astro:content";
+import LogTimeline from "../../components/content/LogTimeline.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { visibleEntries } from "../../lib/content";
+
+const allEntries = await getCollection("log");
+const entries = visibleEntries(
+  allEntries.filter((entry) => entry.data.lang === "en"),
+  import.meta.env.PROD,
+).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout
+  title="Log"
+  description="Build notes, research decisions, experiments, and changelog entries from Bash AI Lab."
+  lang="en"
+  canonicalPath="/log/"
+>
+  <article class="site-frame log-page">
+    <header class="log-page__header">
+      <p class="meta-label">Build notes / Research decisions / Experiments</p>
+      <h1 class="display-title">Log</h1>
+      <p class="lead">
+        A dated record of work in progress, decisions, and research notes.
+      </p>
+    </header>
+
+    <LogTimeline entries={entries} />
+  </article>
+</BaseLayout>
+
+<style>
+  .log-page {
+    padding-block: clamp(4rem, 9vw, 8rem) clamp(5rem, 10vw, 9rem);
+  }
+
+  .log-page__header {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 58rem;
+    padding-block-end: clamp(3rem, 7vw, 6rem);
+  }
+
+  .log-page__header > p {
+    margin: 0;
+  }
+</style>
