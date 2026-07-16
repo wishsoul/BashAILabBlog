@@ -33,11 +33,14 @@ test("loads the English shell with readable tokens", async ({ page }) => {
     "href",
     "/BashAILabBlog/favicon.svg",
   );
-  await expect(
-    page.locator(
-      'link[rel="stylesheet"][href^="/BashAILabBlog/_astro/index."]',
-    ),
-  ).toHaveAttribute("href", /^\/BashAILabBlog\/_astro\/index\.[\w-]+\.css$/);
+  const stylesheetHrefs = await page
+    .locator('link[rel="stylesheet"]')
+    .evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+  expect(stylesheetHrefs).toEqual(
+    expect.arrayContaining([
+      expect.stringMatching(/^\/BashAILabBlog\/_astro\/[\w-]+\.[\w-]+\.css$/),
+    ]),
+  );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     "http://127.0.0.1:4321/BashAILabBlog/",

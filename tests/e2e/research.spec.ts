@@ -66,6 +66,26 @@ test("keeps themes and nested research routes accessible from the archive", asyn
   ).toBeVisible();
 });
 
+test("publishes the Chinese Research archive with reciprocal archive switches", async ({
+  page,
+}) => {
+  await page.goto("./zh/research/");
+
+  await expect(page.locator("html")).toHaveAttribute("lang", "zh");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "研究" }),
+  ).toBeVisible();
+  await expect(page.locator("[data-research-article]")).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Switch to English" }).first(),
+  ).toHaveAttribute("href", "/BashAILabBlog/research/");
+
+  await page.goto("./research/");
+  await expect(
+    page.getByRole("link", { name: "切换到中文" }).first(),
+  ).toHaveAttribute("href", "/BashAILabBlog/zh/research/");
+});
+
 test("renders an article hierarchy, accessible table of contents, and callout", async ({
   page,
 }) => {
