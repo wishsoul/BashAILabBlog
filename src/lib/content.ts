@@ -1,6 +1,6 @@
 import type { Locale } from "../config/site";
 
-type Entry<T> = { id: string; data: T };
+export type Entry<T> = { id: string; data: T };
 
 export function visibleEntries<E extends Entry<{ draft: boolean }>>(
   entries: E[],
