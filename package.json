@@ -18,6 +18,7 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test:links": "node scripts/check-links.mjs",
+    "audit:production": "npm audit --omit=dev --audit-level=moderate",
     "og:generate": "node scripts/generate-og.mjs"
   },
   "dependencies": {
@@ -28,7 +29,6 @@
     "@fontsource-variable/geist-mono": "^5.2.8",
     "@tailwindcss/vite": "^4.3.2",
     "astro": "^7.0.9",
-    "mermaid": "^11.16.0",
     "tailwindcss": "^4.3.2"
   },
   "devDependencies": {

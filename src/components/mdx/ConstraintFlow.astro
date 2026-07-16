@@ -1,0 +1,82 @@
+---
+interface Props {
+  label: string;
+  steps: string[];
+}
+
+const { label, steps } = Astro.props;
+---
+
+<figure class="constraint-flow" data-constraint-flow aria-label={label}>
+  <figcaption>{label}</figcaption>
+  <ol>
+    {
+      steps.map((step) => (
+        <li>
+          <span>{step}</span>
+        </li>
+      ))
+    }
+  </ol>
+</figure>
+
+<style>
+  .constraint-flow {
+    padding: clamp(1rem, 3vw, 2rem);
+    margin: 2rem 0;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .constraint-flow figcaption {
+    margin-block-end: 1rem;
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+  }
+
+  .constraint-flow ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .constraint-flow li {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    font-weight: 540;
+  }
+
+  .constraint-flow li:not(:last-child)::after {
+    color: var(--color-accent);
+    content: "→";
+    font-size: var(--font-size-md);
+    line-height: 1;
+  }
+
+  @media (max-width: 42rem) {
+    .constraint-flow ol {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .constraint-flow li {
+      display: grid;
+      grid-template-columns: 1.25rem minmax(0, 1fr);
+      gap: 0.75rem;
+    }
+
+    .constraint-flow li:not(:last-child)::after {
+      grid-column: 1;
+      grid-row: 2;
+      content: "↓";
+    }
+  }
+</style>

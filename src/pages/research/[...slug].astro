@@ -2,7 +2,7 @@
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import MDXCallout from "../../components/mdx/MDXCallout.astro";
 import BeforeAfter from "../../components/mdx/BeforeAfter.astro";
-import MermaidDiagram from "../../components/mdx/MermaidDiagram.astro";
+import ConstraintFlow from "../../components/mdx/ConstraintFlow.astro";
 import MetricBlock from "../../components/mdx/MetricBlock.astro";
 import QuoteBlock from "../../components/mdx/QuoteBlock.astro";
 import Timeline from "../../components/mdx/Timeline.astro";
@@ -37,7 +37,7 @@ const minutes = entry.data.readingMinutes ?? estimateReadingMinutes(sourceText);
 const mdxComponents = {
   Callout: MDXCallout,
   Metric: MetricBlock,
-  Mermaid: MermaidDiagram,
+  ConstraintFlow,
   Timeline,
   Quote: QuoteBlock,
   BeforeAfter,

@@ -22,14 +22,9 @@ AI-generated native interfaces need more than visual instructions if they are to
 
 This research direction organizes constraints through rules, design tokens, a runtime, validators, and code generation. MacNativeKit is the associated infrastructure profile for exploring that system on macOS with SwiftUI and AppKit.
 
-<Mermaid
+<ConstraintFlow
   label="Constraint-system flow"
-  chart={`flowchart LR
-  Intent --> Rules
-  Rules --> Tokens
-  Tokens --> Runtime
-  Runtime --> Validation
-  Validation --> Codegen`}
+  steps={["Intent", "Rules", "Tokens", "Runtime", "Validation", "Codegen"]}
 />
 
 ## Working scope

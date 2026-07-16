@@ -92,15 +92,20 @@ test("renders an article hierarchy, accessible table of contents, and callout", 
   await expect(page.getByRole("note", { name: "Research note" })).toBeVisible();
 });
 
-test("loads Mermaid only for a diagram article", async ({ page }) => {
+test("renders a static constraint flow only for its research article", async ({
+  page,
+}) => {
   await page.goto("./research/agentic-development/");
-  await expect(page.locator("[data-mermaid-diagram]")).toHaveCount(0);
-  await expect(page.locator("[data-mermaid-loader]")).toHaveCount(0);
+  await expect(page.locator("[data-constraint-flow]")).toHaveCount(0);
 
   await page.goto("./research/designing-constraint-system-ai-ui/");
-  await expect(page.locator("[data-mermaid-diagram]")).toBeVisible();
-  await expect(page.locator("[data-mermaid-loader]")).toHaveCount(1);
-  await expect(page.locator("[data-mermaid-fallback]")).toBeVisible();
+  const flow = page.getByRole("figure", { name: "Constraint-system flow" });
+  await expect(flow).toBeVisible();
+  await expect(flow).toHaveAttribute("data-constraint-flow", "");
+  await expect(flow.getByRole("listitem")).toHaveCount(6);
+  await expect(flow).toContainText("Intent");
+  await expect(flow).toContainText("Codegen");
+  await expect(page.locator("[data-mermaid-diagram]")).toHaveCount(0);
 });
 
 test("marks Research current on archive and nested article routes", async ({

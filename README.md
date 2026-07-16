@@ -40,7 +40,7 @@ Content collections, their required fields, and allowed enum values are defined 
 | Log             | `src/content/log/en/`      | Add a dated Markdown/MDX entry with `date`, `type`, `summary`, tags, and an accurate `draft` value. The archive sorts entries newest first.                                                                                         |
 | Editorial pages | `src/content/pages/en/`    | Edit the approved About or Resume source. The routes resolve the corresponding `en/about` and `en/resume` entries.                                                                                                                  |
 
-After content changes, run `npm run check`, `npm run test`, `npm run build`, and `npm run test:links` before publishing. The content-file tests enforce collection requirements; do not bypass a schema error by inventing a value.
+After content changes, run `npm run check`, `npm run test`, `npm run build`, and `npm run test:links` before publishing. The content-file tests enforce collection requirements; do not bypass a schema error by inventing a value. The published constraint-system article uses the `ConstraintFlow` MDX component, which accepts an ordered `steps` array and is deliberately static so diagrams do not add a browser runtime dependency.
 
 ### Identity and contact details
 
@@ -69,20 +69,21 @@ Theme tokens live in `src/styles/global.css`. The light/dark `--color-background
 
 ## Commands
 
-| Command                | Use                                                                           |
-| ---------------------- | ----------------------------------------------------------------------------- |
-| `npm run dev`          | Start Astro’s development server.                                             |
-| `npm run build`        | Generate the social image and build the static site.                          |
-| `npm run preview`      | Serve `dist/` after a build.                                                  |
-| `npm run og:generate`  | Regenerate `public/images/og/default.png`.                                    |
-| `npm run check`        | Run Astro and TypeScript checks.                                              |
-| `npm run lint`         | Run ESLint.                                                                   |
-| `npm run format`       | Apply Prettier formatting.                                                    |
-| `npm run format:check` | Check Prettier formatting without writing files.                              |
-| `npm run test:unit`    | Run Vitest unit tests.                                                        |
-| `npm run test:e2e`     | Run Playwright browser tests (the config builds and previews the Pages path). |
-| `npm run test`         | Run unit and E2E suites.                                                      |
-| `npm run test:links`   | Validate generated `dist/` links and base-path references.                    |
+| Command                    | Use                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| `npm run dev`              | Start Astro’s development server.                                                |
+| `npm run build`            | Generate the social image and build the static site.                             |
+| `npm run preview`          | Serve `dist/` after a build.                                                     |
+| `npm run og:generate`      | Regenerate `public/images/og/default.png`.                                       |
+| `npm run check`            | Run Astro and TypeScript checks.                                                 |
+| `npm run lint`             | Run ESLint.                                                                      |
+| `npm run format`           | Apply Prettier formatting.                                                       |
+| `npm run format:check`     | Check Prettier formatting without writing files.                                 |
+| `npm run test:unit`        | Run Vitest unit tests.                                                           |
+| `npm run test:e2e`         | Run Playwright browser tests (the config builds and previews the Pages path).    |
+| `npm run test`             | Run unit and E2E suites.                                                         |
+| `npm run test:links`       | Validate generated `dist/` links and base-path references.                       |
+| `npm run audit:production` | Fail when production dependencies have moderate-or-higher known vulnerabilities. |
 
 The release sequence is:
 
@@ -91,6 +92,7 @@ npm ci
 npm run format:check
 npm run lint
 npm run check
+npm run audit:production
 npm run test
 PUBLIC_SITE_URL=https://bashxu.github.io PUBLIC_BASE_PATH=/BashAILabBlog npm run build
 npm run test:links
