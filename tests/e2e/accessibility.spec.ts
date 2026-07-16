@@ -157,3 +157,28 @@ test("returns a long research page to its in-page top target", async ({
     .toBeLessThanOrEqual(1);
   await expect(page.locator("#top")).toBeInViewport();
 });
+
+test("returns a Work detail page to its in-page top target below the fixed header", async ({
+  page,
+}) => {
+  await page.goto("./work/mac-native-kit/");
+  const backToTop = page.getByRole("link", { name: "Back to top" });
+
+  await backToTop.scrollIntoViewIfNeeded();
+  await expect(backToTop).toBeVisible();
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+
+  await backToTop.click();
+  await expect
+    .poll(async () =>
+      page.locator("#top").evaluate((target) => {
+        const header = document.querySelector("[data-site-header]");
+        return Math.abs(
+          target.getBoundingClientRect().top -
+            (header?.getBoundingClientRect().height ?? 0),
+        );
+      }),
+    )
+    .toBeLessThanOrEqual(1);
+  await expect(page.locator("#top")).toBeInViewport();
+});
