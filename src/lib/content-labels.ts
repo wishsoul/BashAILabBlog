@@ -29,6 +29,7 @@ const labels: Record<Locale, Record<string, string>> = {
     "Research Note": "研究笔记",
     Changelog: "更新日志",
     Decision: "决策",
+    "iOS and macOS": "iOS 和 macOS",
   },
 };
 

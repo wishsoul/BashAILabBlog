@@ -30,6 +30,18 @@ export const zh = {
   breadcrumb: {
     home: "首页",
   },
+  accessibility: {
+    skipToMainContent: "跳至主要内容",
+    breadcrumb: "面包屑",
+    tableOfContents: "目录",
+    onThisPage: "本页内容",
+    backToTop: "返回顶部",
+  },
+  seo: {
+    homeTitle: "Bash AI 实验室 — AI 产品研究与独立软件",
+    homeDescription:
+      "Bash AI 实验室的 AI 产品研究、智能体开发系统与独立软件实践。",
+  },
   archive: {
     filterByCategory: "按类别筛选",
     allProjectsShown: "显示所有项目。",

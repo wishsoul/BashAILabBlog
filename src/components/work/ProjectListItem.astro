@@ -38,7 +38,9 @@ const href = withBase(contentPath(locale, "work", entry.id));
     </div>
 
     <div class="project-list-item__summary flow">
-      <p class="meta-label">{entry.data.platform}</p>
+      <p class="meta-label">
+        {displayContentLabel(locale, entry.data.platform)}
+      </p>
       <h2 data-project-list-title>{entry.data.title}</h2>
       <p>{entry.data.description}</p>
     </div>
@@ -73,7 +75,7 @@ const href = withBase(contentPath(locale, "work", entry.id));
           <p>{displayContentLabel(locale, entry.data.category)}</p>
           <strong>{entry.data.title}</strong>
           <div class="project-specimen__baseline">
-            <span>{entry.data.platform}</span>
+            <span>{displayContentLabel(locale, entry.data.platform)}</span>
             <span>{ui.brand}</span>
           </div>
         </div>

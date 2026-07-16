@@ -59,6 +59,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 >
   <article id="top" class="site-frame content-layout">
     <Breadcrumb
+      locale={locale}
       items={[
         { label: ui.breadcrumb.home, href: localizedPath(locale, "/") },
         { label: ui.nav.research, href: localizedPath(locale, "/research/") },
@@ -96,7 +97,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 
     <div class="content-layout__body">
       <aside class="content-layout__rail">
-        <TableOfContents headings={headings} />
+        <TableOfContents headings={headings} locale={locale} />
       </aside>
       <div class="content-layout__prose" data-content-prose>
         <slot />
@@ -104,7 +105,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
     </div>
 
     <footer class="content-layout__footer">
-      <BackToTop />
+      <BackToTop locale={locale} />
     </footer>
   </article>
 </BaseLayout>

@@ -28,6 +28,17 @@ export interface UiCopy {
   breadcrumb: {
     home: string;
   };
+  accessibility: {
+    skipToMainContent: string;
+    breadcrumb: string;
+    tableOfContents: string;
+    onThisPage: string;
+    backToTop: string;
+  };
+  seo: {
+    homeTitle: string;
+    homeDescription: string;
+  };
   archive: {
     filterByCategory: string;
     allProjectsShown: string;
@@ -127,6 +138,18 @@ export const en = {
   },
   breadcrumb: {
     home: "Home",
+  },
+  accessibility: {
+    skipToMainContent: "Skip to main content",
+    breadcrumb: "Breadcrumb",
+    tableOfContents: "Table of contents",
+    onThisPage: "On this page",
+    backToTop: "Back to top",
+  },
+  seo: {
+    homeTitle: "Bash AI Lab — AI Product Research & Independent Software",
+    homeDescription:
+      "AI product research, agentic development systems and independent software built by Bash.",
   },
   archive: {
     filterByCategory: "Filter by category",

@@ -32,7 +32,7 @@ const startedAt = entry.data.startedAt?.toLocaleDateString(
   </div>
   <div>
     <dt>{ui.metadata.platform}</dt>
-    <dd>{entry.data.platform}</dd>
+    <dd>{displayContentLabel(locale, entry.data.platform)}</dd>
   </div>
   <div class="project-metadata__role">
     <dt>{ui.metadata.role}</dt>

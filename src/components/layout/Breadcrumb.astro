@@ -1,4 +1,6 @@
 ---
+import type { Locale } from "../../config/site";
+import { getUi } from "../../i18n";
 import { withBase } from "../../lib/urls";
 
 interface BreadcrumbItem {
@@ -8,12 +10,14 @@ interface BreadcrumbItem {
 
 interface Props {
   items: readonly BreadcrumbItem[];
+  locale?: Locale;
 }
 
-const { items } = Astro.props;
+const { items, locale = "en" } = Astro.props;
+const ui = getUi(locale);
 ---
 
-<nav class="breadcrumb" aria-label="Breadcrumb">
+<nav class="breadcrumb" aria-label={ui.accessibility.breadcrumb}>
   <ol>
     {
       items.map((item, index) => (

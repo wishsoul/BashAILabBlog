@@ -45,6 +45,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 >
   <article id="top" class="site-frame project-layout">
     <Breadcrumb
+      locale={locale}
       items={[
         { label: ui.breadcrumb.home, href: localizedPath(locale, "/") },
         { label: ui.nav.work, href: localizedPath(locale, "/work/") },
@@ -83,7 +84,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
               <span>{projectNumber}</span>
               <strong>{entry.data.title}</strong>
               <p>
-                {entry.data.platform} /
+                {displayContentLabel(locale, entry.data.platform)} /
                 {displayContentLabel(locale, entry.data.category)}
               </p>
             </div>
@@ -132,7 +133,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
     </div>
 
     <footer class="project-layout__footer">
-      <BackToTop />
+      <BackToTop locale={locale} />
     </footer>
   </article>
 </BaseLayout>

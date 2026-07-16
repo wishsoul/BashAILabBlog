@@ -1,4 +1,7 @@
 ---
+import type { Locale } from "../../config/site";
+import { getUi } from "../../i18n";
+
 interface Heading {
   depth: number;
   slug: string;
@@ -7,9 +10,11 @@ interface Heading {
 
 interface Props {
   headings: Heading[];
+  locale?: Locale;
 }
 
-const { headings } = Astro.props;
+const { headings, locale = "en" } = Astro.props;
+const ui = getUi(locale);
 const items = headings.filter(
   (heading) => heading.depth >= 2 && heading.depth <= 3,
 );
@@ -17,8 +22,11 @@ const items = headings.filter(
 
 {
   items.length > 0 && (
-    <nav class="table-of-contents" aria-label="Table of contents">
-      <p class="meta-label">On this page</p>
+    <nav
+      class="table-of-contents"
+      aria-label={ui.accessibility.tableOfContents}
+    >
+      <p class="meta-label">{ui.accessibility.onThisPage}</p>
       <ol>
         {items.map((heading) => (
           <li

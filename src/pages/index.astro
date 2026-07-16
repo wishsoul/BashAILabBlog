@@ -6,7 +6,6 @@ import HeroSection from "../components/layout/HeroSection.astro";
 import SectionHeader from "../components/layout/SectionHeader.astro";
 import LabStatus from "../components/work/LabStatus.astro";
 import ProjectFeature from "../components/work/ProjectFeature.astro";
-import { SITE } from "../config/site";
 import { getUi } from "../i18n";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
@@ -36,8 +35,8 @@ const latestResearch = visibleResearch
 ---
 
 <BaseLayout
-  title={SITE.title}
-  description={SITE.description}
+  title={ui.seo.homeTitle}
+  description={ui.seo.homeDescription}
   lang="en"
   canonicalPath="/"
   translationPath="/zh/"
@@ -117,7 +116,7 @@ const latestResearch = visibleResearch
       label="Now Building"
       title="Lab Status"
     />
-    <LabStatus entries={visibleWork} />
+    <LabStatus entries={visibleWork} locale="en" />
   </section>
 </BaseLayout>
 

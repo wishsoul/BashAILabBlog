@@ -39,7 +39,7 @@ const href = withBase(contentPath(locale, "work", entry.id));
     <div class="project-feature__title flow">
       <p class="meta-label">
         {displayContentLabel(locale, entry.data.category)} / {
-          entry.data.platform
+          displayContentLabel(locale, entry.data.platform)
         }
       </p>
       <h3 data-project-title>{entry.data.title}</h3>
@@ -75,7 +75,7 @@ const href = withBase(contentPath(locale, "work", entry.id));
           <p>{displayContentLabel(locale, entry.data.category)}</p>
           <strong>{entry.data.title}</strong>
           <div class="project-cover__baseline">
-            <span>{entry.data.platform}</span>
+            <span>{displayContentLabel(locale, entry.data.platform)}</span>
             <span>{ui.brand}</span>
           </div>
         </div>
