@@ -70,13 +70,24 @@ test("mobile navigation handles rapid toggles and leaves hidden links unfocusabl
       (element) => getComputedStyle(element).transitionProperty,
     ),
   ).toContain("display");
+  await expect(panel).toHaveCSS("transition-duration", "0.16s");
 
-  await trigger.click({ clickCount: 4 });
+  await trigger.click();
+  await expect(trigger).toHaveAccessibleName("Close menu");
+  await expect(panel).toBeVisible();
+  expect(
+    await panel.evaluate((element) =>
+      getComputedStyle(element).transitionDuration.split(", "),
+    ),
+  ).toEqual(["0.2s", "0.2s", "0.2s"]);
+
+  await trigger.click({ clickCount: 3 });
   await expect(trigger).toHaveAccessibleName("Menu");
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await expect(mobileNavigation).toBeHidden();
   await expect(panel).toHaveJSProperty("hidden", true);
   await expect(workLink).toBeHidden();
+  await expect(panel).toHaveCSS("transition-duration", "0.16s");
 
   await workLink.evaluate((link) => link.focus());
   await expect(workLink).not.toBeFocused();
