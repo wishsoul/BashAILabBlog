@@ -80,6 +80,96 @@ test("filters Work by category and persists the selected filter in the URL", asy
   await expect(page.locator("[data-project-list-item]:visible")).toHaveCount(4);
 });
 
+test("rapid filter clicks leave the final category, projects, and URL in sync", async ({
+  page,
+}) => {
+  await page.goto("./work/");
+
+  const products = page.getByRole("button", { name: "Products" });
+  const infrastructure = page.getByRole("button", { name: "Infrastructure" });
+  await products.click();
+  await infrastructure.click();
+
+  await expect(infrastructure).toHaveAttribute("aria-pressed", "true");
+  await expect(products).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("[data-project-list-item]:visible")).toHaveCount(1);
+  await expect(page).toHaveURL(/\?category=Infrastructure$/u);
+});
+
+test("back and forward update filter state without waiting for a transition", async ({
+  page,
+}) => {
+  await page.goto("./work/");
+
+  const all = page.getByRole("button", { name: "All" });
+  const products = page.getByRole("button", { name: "Products" });
+  const infrastructure = page.getByRole("button", { name: "Infrastructure" });
+  await products.click();
+  await infrastructure.click();
+
+  await page.goBack();
+  await expect(products).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("[data-project-list-item]:visible")).toHaveCount(3);
+  await expect(page).toHaveURL(/\?category=Products$/u);
+
+  await page.goBack();
+  await expect(all).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("[data-project-list-item]:visible")).toHaveCount(4);
+  await expect(page).not.toHaveURL(/category=/u);
+
+  await page.goForward();
+  await expect(products).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("[data-project-list-item]:visible")).toHaveCount(3);
+  await expect(page).toHaveURL(/\?category=Products$/u);
+});
+
+test("filter projects expose unique stable transition names", async ({
+  page,
+}) => {
+  await page.goto("./work/");
+
+  const transitionNames = await page
+    .locator("[data-project-list-item]")
+    .evaluateAll((items) =>
+      items.map((item) => item.getAttribute("data-project-transition-name")),
+    );
+
+  expect(transitionNames).toHaveLength(projects.length);
+  expect(transitionNames.every(Boolean)).toBe(true);
+  expect(new Set(transitionNames).size).toBe(projects.length);
+
+  await page.reload();
+  await expect(page.locator("[data-project-list-item]")).toHaveCount(
+    projects.length,
+  );
+  expect(
+    await page
+      .locator("[data-project-list-item]")
+      .evaluateAll((items) =>
+        items.map((item) => item.getAttribute("data-project-transition-name")),
+      ),
+  ).toEqual(transitionNames);
+});
+
+test("filter fallback works without the View Transition API", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(document, "startViewTransition", {
+      configurable: true,
+      value: undefined,
+    });
+  });
+  await page.goto("./work/");
+
+  const products = page.getByRole("button", { name: "Products" });
+  await products.click();
+
+  await expect(products).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("[data-project-list-item]:visible")).toHaveCount(3);
+  await expect(page).toHaveURL(/\?category=Products$/u);
+});
+
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 

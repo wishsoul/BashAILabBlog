@@ -158,6 +158,34 @@ test("theme toggle reflects the system preference when no choice is stored", asy
   ).toBeVisible();
 });
 
+for (const viewTransitionMode of ["native", "fallback"] as const) {
+  test(`rapid theme clicks leave the last choice consistent with the ${viewTransitionMode} path`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.addInitScript((disableViewTransitions) => {
+      localStorage.removeItem("theme");
+      if (disableViewTransitions) {
+        Object.defineProperty(document, "startViewTransition", {
+          configurable: true,
+          value: undefined,
+        });
+      }
+    }, viewTransitionMode === "fallback");
+    await page.goto("./");
+
+    const toggle = page.locator("[data-theme-toggle]");
+    await toggle.evaluate((button: HTMLButtonElement) => {
+      button.click();
+      button.click();
+    });
+
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(toggle).toHaveAccessibleName("Use dark theme");
+    expect(await page.evaluate(() => localStorage.theme)).toBe("light");
+  });
+}
+
 test("language switch falls back to the base-safe Chinese edition route", async ({
   page,
 }) => {
