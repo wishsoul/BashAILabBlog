@@ -44,7 +44,7 @@ test("desktop navigation identifies the current page and keeps internal links ba
   ).toHaveAttribute("rel", "noopener noreferrer");
 });
 
-test("mobile navigation opens, closes, and leaves hidden links unfocusable", async ({
+test("mobile navigation handles rapid toggles and leaves hidden links unfocusable", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -55,6 +55,7 @@ test("mobile navigation opens, closes, and leaves hidden links unfocusable", asy
     name: "Mobile",
     includeHidden: true,
   });
+  const panel = page.locator("[data-mobile-navigation-panel]");
   const workLink = mobileNavigation.getByRole("link", {
     name: "Work",
     includeHidden: true,
@@ -63,20 +64,36 @@ test("mobile navigation opens, closes, and leaves hidden links unfocusable", asy
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await expect(mobileNavigation).toBeHidden();
   await expect(workLink).toBeHidden();
+  await expect(panel).toHaveJSProperty("hidden", true);
+  expect(
+    await panel.evaluate(
+      (element) => getComputedStyle(element).transitionProperty,
+    ),
+  ).toContain("display");
 
-  await trigger.click();
-  await expect(trigger).toHaveAccessibleName("Close menu");
-  await expect(trigger).toHaveAttribute("aria-expanded", "true");
-  await expect(mobileNavigation).toBeVisible();
-  await expect(workLink).toBeVisible();
-
-  await trigger.click();
+  await trigger.click({ clickCount: 4 });
   await expect(trigger).toHaveAccessibleName("Menu");
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await expect(mobileNavigation).toBeHidden();
+  await expect(panel).toHaveJSProperty("hidden", true);
+  await expect(workLink).toBeHidden();
 
   await workLink.evaluate((link) => link.focus());
   await expect(workLink).not.toBeFocused();
+});
+
+test("mobile navigation removes panel movement for reduced motion", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("./");
+
+  await page.getByRole("button", { name: "Menu" }).click();
+  await expect(page.locator("[data-mobile-navigation-panel]")).toHaveCSS(
+    "transform",
+    "none",
+  );
 });
 
 test("mobile navigation closes on Escape and restores focus", async ({

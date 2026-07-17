@@ -150,10 +150,17 @@ const isCurrent = (href: string) => {
       font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       letter-spacing: 0.04em;
+      transition: transform var(--duration-press) var(--ease-out);
     }
 
-    .mobile-navigation__trigger:hover {
-      color: var(--color-text);
+    .mobile-navigation__trigger:active {
+      transform: scale(0.97);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .mobile-navigation__trigger:hover {
+        color: var(--color-text);
+      }
     }
 
     .mobile-navigation__indicator {
@@ -169,7 +176,7 @@ const isCurrent = (href: string) => {
       height: 1px;
       background: currentColor;
       content: "";
-      transition: transform 160ms ease;
+      transition: transform var(--duration-fast) var(--ease-in-out);
     }
 
     .mobile-navigation__indicator::after {
@@ -192,10 +199,47 @@ const isCurrent = (href: string) => {
       inset: var(--site-header-height) 0 auto;
       border-block: 1px solid var(--color-border);
       background: var(--color-background);
+      opacity: 1;
+      transform: translateY(0);
+      transition:
+        opacity var(--duration-enter) var(--ease-out),
+        transform var(--duration-enter) var(--ease-out),
+        display var(--duration-enter) var(--ease-out);
+      transition-behavior: allow-discrete;
+    }
+
+    @starting-style {
+      .mobile-navigation__panel {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+      }
     }
 
     .mobile-navigation__panel[hidden] {
       display: none;
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mobile-navigation__trigger {
+        transition: none;
+      }
+
+      .mobile-navigation__trigger:active {
+        transform: none;
+      }
+
+      .mobile-navigation__panel,
+      .mobile-navigation__panel[hidden] {
+        transform: none;
+      }
+
+      .mobile-navigation__panel {
+        transition:
+          opacity var(--duration-fast) var(--ease-in-out),
+          display var(--duration-fast) var(--ease-in-out);
+      }
     }
 
     .mobile-navigation__list {
