@@ -151,11 +151,13 @@ const href = withBase(contentPath(locale, "work", entry.id));
 
   .project-feature__link span {
     color: var(--color-accent);
-    transition: transform 160ms ease;
+    transition: transform var(--duration-fast) var(--ease-out);
   }
 
-  .project-feature__link:hover span {
-    transform: translate(0.15rem, -0.15rem);
+  @media (hover: hover) and (pointer: fine) {
+    .project-feature__link:hover span {
+      transform: translate(0.15rem, -0.15rem);
+    }
   }
 
   .project-feature__visual {

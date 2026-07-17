@@ -79,7 +79,7 @@ test("resolves reduced-motion styles and accessible contrast-critical tokens", a
       .locator(".theme-toggle__disc")
       .evaluate((element) => getComputedStyle(element).transitionDuration),
   );
-  expect(transitionDuration).toBeLessThanOrEqual(0.01);
+  expect(transitionDuration).toBe(0);
 
   const contrastRatios = await page.evaluate(() => {
     const luminance = (color: string) => {

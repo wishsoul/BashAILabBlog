@@ -19,6 +19,7 @@ const { entry, index, locale } = Astro.props;
 const ui = getUi(locale);
 const number = String(index + 1).padStart(2, "0");
 const href = withBase(contentPath(locale, "work", entry.id));
+const transitionName = `project-${entry.id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
 ---
 
 <article
@@ -28,6 +29,7 @@ const href = withBase(contentPath(locale, "work", entry.id));
   ]}
   data-project-list-item
   data-project-category={entry.data.category}
+  data-project-transition-name={transitionName}
 >
   <div class="project-list-item__content">
     <div class="project-list-item__index">
@@ -147,11 +149,13 @@ const href = withBase(contentPath(locale, "work", entry.id));
 
   .project-list-item__link span {
     color: var(--color-accent);
-    transition: transform 160ms ease;
+    transition: transform var(--duration-fast) var(--ease-out);
   }
 
-  .project-list-item__link:hover span {
-    transform: translate(0.15rem, -0.15rem);
+  @media (hover: hover) and (pointer: fine) {
+    .project-list-item__link:hover span {
+      transform: translate(0.15rem, -0.15rem);
+    }
   }
 
   .project-list-item__visual {

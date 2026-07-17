@@ -19,7 +19,7 @@ const ui = getUi(lang);
   data-home-section="hero"
   aria-labelledby="home-title"
 >
-  <div class="hero__heading flow">
+  <div class="hero__heading flow" data-hero-motion-group="heading">
     <p class="meta-label">{ui.hero.eyebrow}</p>
     <h1 id="home-title" class="display-title">
       {ui.hero.title}
@@ -27,22 +27,26 @@ const ui = getUi(lang);
   </div>
 
   <div class="hero__context">
-    <p class="hero__lead lead" data-hero-lead>
-      {ui.hero.description}
-    </p>
+    <div class="hero__details" data-hero-motion-group="context">
+      <p class="hero__lead lead" data-hero-lead>
+        {ui.hero.description}
+      </p>
 
-    <ul class="hero__focus" aria-label={ui.hero.researchAreas}>
-      {
-        ui.hero.focusAreas.map((area, index) => (
-          <li>
-            <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-            {area}
-          </li>
-        ))
-      }
-    </ul>
+      <ul class="hero__focus" aria-label={ui.hero.researchAreas}>
+        {
+          ui.hero.focusAreas.map((area, index) => (
+            <li>
+              <span aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              {area}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
 
-    <div class="hero__footer">
+    <div class="hero__footer" data-hero-motion-group="footer">
       <p class="meta-label">{ui.hero.location}</p>
       <nav class="hero__actions" aria-label={ui.hero.introduction}>
         <a href={withBase(localizedPath(lang, "/work/"))}>
@@ -67,6 +71,8 @@ const ui = getUi(lang);
 
   .hero__heading {
     --flow-space: clamp(1.5rem, 4vw, 3rem);
+    animation: hero-enter 420ms var(--ease-out) both;
+    animation-delay: 0ms;
   }
 
   .hero h1 {
@@ -80,6 +86,15 @@ const ui = getUi(lang);
     gap: clamp(2rem, 6vw, 7rem);
     margin-block-start: clamp(4rem, 8vw, 8rem);
     margin-inline-start: min(11vw, 9rem);
+  }
+
+  .hero__details {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    gap: inherit;
+    animation: hero-enter 420ms var(--ease-out) both;
+    animation-delay: 60ms;
   }
 
   .hero__lead {
@@ -116,6 +131,8 @@ const ui = getUi(lang);
     gap: 2rem;
     padding-block-start: clamp(1.75rem, 4vw, 3rem);
     border-block-start: 1px solid var(--color-border);
+    animation: hero-enter 420ms var(--ease-out) both;
+    animation-delay: 120ms;
   }
 
   .hero__footer p {
@@ -138,7 +155,7 @@ const ui = getUi(lang);
     font-size: var(--font-size-sm);
     font-weight: 520;
     text-decoration: none;
-    transition: border-color 160ms ease;
+    transition: border-color var(--duration-fast) var(--ease-out);
   }
 
   .hero__actions a:hover {
@@ -147,11 +164,44 @@ const ui = getUi(lang);
 
   .hero__actions span {
     color: var(--color-accent);
-    transition: transform 160ms ease;
+    transition: transform var(--duration-fast) var(--ease-out);
   }
 
-  .hero__actions a:hover span {
-    transform: translate(0.15rem, -0.15rem);
+  @media (hover: hover) and (pointer: fine) {
+    .hero__actions a:hover span {
+      transform: translate(0.15rem, -0.15rem);
+    }
+  }
+
+  @keyframes hero-enter {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes hero-enter-reduced {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__heading,
+    .hero__details,
+    .hero__footer {
+      animation: hero-enter-reduced var(--duration-fast) var(--ease-out) both;
+      transform: none;
+    }
   }
 
   @media (max-width: 47.999rem) {

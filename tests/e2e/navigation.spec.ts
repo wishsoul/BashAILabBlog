@@ -44,7 +44,7 @@ test("desktop navigation identifies the current page and keeps internal links ba
   ).toHaveAttribute("rel", "noopener noreferrer");
 });
 
-test("mobile navigation opens, closes, and leaves hidden links unfocusable", async ({
+test("mobile navigation handles rapid toggles and leaves hidden links unfocusable", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -55,6 +55,7 @@ test("mobile navigation opens, closes, and leaves hidden links unfocusable", asy
     name: "Mobile",
     includeHidden: true,
   });
+  const panel = page.locator("[data-mobile-navigation-panel]");
   const workLink = mobileNavigation.getByRole("link", {
     name: "Work",
     includeHidden: true,
@@ -63,20 +64,47 @@ test("mobile navigation opens, closes, and leaves hidden links unfocusable", asy
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await expect(mobileNavigation).toBeHidden();
   await expect(workLink).toBeHidden();
+  await expect(panel).toHaveJSProperty("hidden", true);
+  expect(
+    await panel.evaluate(
+      (element) => getComputedStyle(element).transitionProperty,
+    ),
+  ).toContain("display");
+  await expect(panel).toHaveCSS("transition-duration", "0.16s");
 
   await trigger.click();
   await expect(trigger).toHaveAccessibleName("Close menu");
-  await expect(trigger).toHaveAttribute("aria-expanded", "true");
-  await expect(mobileNavigation).toBeVisible();
-  await expect(workLink).toBeVisible();
+  await expect(panel).toBeVisible();
+  expect(
+    await panel.evaluate((element) =>
+      getComputedStyle(element).transitionDuration.split(", "),
+    ),
+  ).toEqual(["0.2s", "0.2s", "0.2s"]);
 
-  await trigger.click();
+  await trigger.click({ clickCount: 3 });
   await expect(trigger).toHaveAccessibleName("Menu");
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await expect(mobileNavigation).toBeHidden();
+  await expect(panel).toHaveJSProperty("hidden", true);
+  await expect(workLink).toBeHidden();
+  await expect(panel).toHaveCSS("transition-duration", "0.16s");
 
   await workLink.evaluate((link) => link.focus());
   await expect(workLink).not.toBeFocused();
+});
+
+test("mobile navigation removes panel movement for reduced motion", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("./");
+
+  await page.getByRole("button", { name: "Menu" }).click();
+  await expect(page.locator("[data-mobile-navigation-panel]")).toHaveCSS(
+    "transform",
+    "none",
+  );
 });
 
 test("mobile navigation closes on Escape and restores focus", async ({
@@ -129,6 +157,58 @@ test("theme toggle reflects the system preference when no choice is stored", asy
     page.getByRole("button", { name: "Use light theme" }),
   ).toBeVisible();
 });
+
+test("theme reduced motion skips the View Transition API", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.addInitScript(() => {
+    localStorage.removeItem("theme");
+    Object.defineProperty(document, "startViewTransition", {
+      configurable: true,
+      value: () => {
+        document.documentElement.dataset.unexpectedViewTransition = "true";
+      },
+    });
+  });
+  await page.goto("./");
+
+  const toggle = page.locator("[data-theme-toggle]");
+  await toggle.click();
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(toggle).toHaveAccessibleName("Use light theme");
+  expect(await page.evaluate(() => localStorage.theme)).toBe("dark");
+  await expect(page.locator("html")).not.toHaveAttribute(
+    "data-unexpected-view-transition",
+  );
+});
+
+for (const viewTransitionMode of ["native", "fallback"] as const) {
+  test(`rapid theme clicks leave the last choice consistent with the ${viewTransitionMode} path`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.addInitScript((disableViewTransitions) => {
+      localStorage.removeItem("theme");
+      if (disableViewTransitions) {
+        Object.defineProperty(document, "startViewTransition", {
+          configurable: true,
+          value: undefined,
+        });
+      }
+    }, viewTransitionMode === "fallback");
+    await page.goto("./");
+
+    const toggle = page.locator("[data-theme-toggle]");
+    await toggle.evaluate((button: HTMLButtonElement) => {
+      button.click();
+      button.click();
+    });
+
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(toggle).toHaveAccessibleName("Use dark theme");
+    expect(await page.evaluate(() => localStorage.theme)).toBe("light");
+  });
+}
 
 test("language switch falls back to the base-safe Chinese edition route", async ({
   page,

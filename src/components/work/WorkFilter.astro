@@ -49,6 +49,25 @@ const filters = ["All", ...categories];
   const availableFilters = new Set(
     filterButtons.map((button) => button.dataset.category),
   );
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  );
+  let activeFilterTransition: ViewTransition | undefined;
+  let requestedFilter = "All";
+  let filterRequestVersion = 0;
+
+  function setProjectTransitionNames() {
+    for (const item of projectItems) {
+      const transitionName = item.dataset.projectTransitionName;
+      if (transitionName) item.style.viewTransitionName = transitionName;
+    }
+  }
+
+  function clearProjectTransitionNames() {
+    for (const item of projectItems) {
+      item.style.removeProperty("view-transition-name");
+    }
+  }
 
   function filterFromUrl() {
     const requested = new URL(window.location.href).searchParams.get(
@@ -57,7 +76,7 @@ const filters = ["All", ...categories];
     return requested && availableFilters.has(requested) ? requested : "All";
   }
 
-  function applyFilter(filter: string) {
+  function updateFilter(filter: string, persist: boolean) {
     for (const button of filterButtons) {
       button.setAttribute(
         "aria-pressed",
@@ -68,6 +87,10 @@ const filters = ["All", ...categories];
     for (const item of projectItems) {
       item.hidden = filter !== "All" && item.dataset.projectCategory !== filter;
     }
+
+    if (persist) {
+      persistFilter(filter);
+    }
   }
 
   function persistFilter(filter: string) {
@@ -77,17 +100,59 @@ const filters = ["All", ...categories];
     window.history.pushState({}, "", url);
   }
 
+  function runFilter(
+    filter: string,
+    shouldPersist: boolean,
+    shouldAnimate: boolean,
+  ) {
+    const isSelected = requestedFilter === filter;
+    requestedFilter = filter;
+    const requestVersion = ++filterRequestVersion;
+    if (
+      !shouldAnimate ||
+      prefersReducedMotion.matches ||
+      !document.startViewTransition ||
+      isSelected
+    ) {
+      activeFilterTransition?.skipTransition();
+      activeFilterTransition = undefined;
+      delete document.documentElement.dataset.workFilterTransition;
+      clearProjectTransitionNames();
+      updateFilter(filter, shouldPersist);
+      return;
+    }
+
+    if (shouldPersist) persistFilter(filter);
+    activeFilterTransition?.skipTransition();
+    setProjectTransitionNames();
+    document.documentElement.dataset.workFilterTransition = "true";
+    const transition = document.startViewTransition(() => {
+      if (requestVersion !== filterRequestVersion) return;
+      updateFilter(filter, false);
+    });
+    activeFilterTransition = transition;
+    void transition.finished
+      .catch(() => {})
+      .finally(() => {
+        if (activeFilterTransition !== transition) return;
+        delete document.documentElement.dataset.workFilterTransition;
+        clearProjectTransitionNames();
+        activeFilterTransition = undefined;
+      });
+  }
+
   for (const button of filterButtons) {
     button.addEventListener("click", () => {
       const filter = button.dataset.category;
       if (!filter) return;
-      applyFilter(filter);
-      persistFilter(filter);
+      runFilter(filter, true, true);
     });
   }
 
-  window.addEventListener("popstate", () => applyFilter(filterFromUrl()));
-  applyFilter(filterFromUrl());
+  window.addEventListener("popstate", () =>
+    runFilter(filterFromUrl(), false, false),
+  );
+  runFilter(filterFromUrl(), false, false);
 </script>
 
 <style>
@@ -120,6 +185,11 @@ const filters = ["All", ...categories];
     cursor: pointer;
     font-family: var(--font-mono);
     font-size: var(--font-size-xs);
+    transition: transform var(--duration-press) var(--ease-out);
+  }
+
+  .work-filter button:active {
+    transform: scale(0.97);
   }
 
   .work-filter button::before {
@@ -132,9 +202,14 @@ const filters = ["All", ...categories];
     content: "";
   }
 
-  .work-filter button:hover,
   .work-filter button[aria-pressed="true"] {
     color: var(--color-text);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .work-filter button:hover {
+      color: var(--color-text);
+    }
   }
 
   .work-filter button[aria-pressed="true"]::before {
@@ -146,6 +221,58 @@ const filters = ["All", ...categories];
     grid-column: 2;
     color: var(--color-text-secondary);
     font-size: var(--font-size-xs);
+  }
+
+  :global(html[data-work-filter-transition="true"]::view-transition-old(*)) {
+    animation: work-filter-fade-out 120ms linear;
+  }
+
+  :global(html[data-work-filter-transition="true"]::view-transition-new(*)) {
+    animation: work-filter-enter 180ms var(--ease-out);
+  }
+
+  :global(html[data-work-filter-transition="true"]::view-transition-group(*)) {
+    animation-duration: var(--duration-layout);
+    animation-timing-function: var(--ease-in-out);
+  }
+
+  :global(html[data-work-filter-transition="true"]::view-transition-old(root)),
+  :global(html[data-work-filter-transition="true"]::view-transition-new(root)),
+  :global(
+    html[data-work-filter-transition="true"]::view-transition-group(root)
+  ) {
+    animation: none;
+  }
+
+  @keyframes work-filter-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes work-filter-enter {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .work-filter button {
+      transition: none;
+    }
+
+    .work-filter button:active {
+      transform: none;
+    }
+
+    :global(html[data-work-filter-transition="true"]::view-transition-old(*)),
+    :global(html[data-work-filter-transition="true"]::view-transition-new(*)),
+    :global(
+      html[data-work-filter-transition="true"]::view-transition-group(*)
+    ) {
+      animation: none;
+    }
   }
 
   @media (max-width: 40rem) {

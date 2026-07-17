@@ -30,10 +30,12 @@ const ui = getUi(locale);
 
   .back-to-top span {
     color: var(--color-accent);
-    transition: transform 160ms ease;
+    transition: transform var(--duration-fast) var(--ease-out);
   }
 
-  .back-to-top:hover span {
-    transform: translateY(-0.2rem);
+  @media (hover: hover) and (pointer: fine) {
+    .back-to-top:hover span {
+      transform: translateY(-0.2rem);
+    }
   }
 </style>

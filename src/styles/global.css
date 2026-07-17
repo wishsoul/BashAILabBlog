@@ -28,6 +28,13 @@
   --page-width: 82rem;
   --reading-width: 40rem;
   --reading-wide-width: 52rem;
+  --duration-press: 140ms;
+  --duration-fast: 160ms;
+  --duration-enter: 200ms;
+  --duration-layout: 220ms;
+  --duration-brand: 260ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 [data-theme="dark"] {
@@ -172,12 +179,7 @@ svg {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  html {
+    scroll-behavior: auto;
   }
 }
