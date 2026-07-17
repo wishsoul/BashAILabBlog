@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 import ExternalLink from "../components/content/ExternalLink.astro";
 import TagList from "../components/content/TagList.astro";
+import TableOfContents from "../components/content/TableOfContents.astro";
 import BackToTop from "../components/layout/BackToTop.astro";
 import Breadcrumb from "../components/layout/Breadcrumb.astro";
 import ProjectMetadata from "../components/work/ProjectMetadata.astro";
@@ -13,16 +14,27 @@ import { contentPath, localizedPath } from "../lib/localized-content";
 import { buildWorkJsonLd, DEFAULT_OG_IMAGE } from "../lib/seo";
 import BaseLayout from "./BaseLayout.astro";
 
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
 interface Props {
   entry: CollectionEntry<"work">;
+  headings: Heading[];
   translationPath?: string;
 }
 
-const { entry, translationPath } = Astro.props;
+const { entry, headings, translationPath } = Astro.props;
 const locale = entry.data.lang;
 const ui = getUi(locale);
 const projectNumber = String(entry.data.order).padStart(2, "0");
 const hasActions = Boolean(entry.data.github || entry.data.demo);
+const tableOfContentsHeadings = headings.filter(
+  (heading) => heading.depth >= 2 && heading.depth <= 3,
+);
+const hasTableOfContents = tableOfContentsHeadings.length > 0;
 const canonicalPath = contentPath(locale, "work", entry.id);
 const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 ---
@@ -122,12 +134,25 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
       }
     </section>
 
-    <div class="project-layout__body">
-      <aside class="project-layout__rail" aria-hidden="true">
-        <span>{projectNumber}</span>
-        <span>{ui.project.caseStudy}</span>
-      </aside>
-      <div class="project-case-study" data-project-case-study>
+    <div
+      class:list={[
+        "project-layout__body",
+        {
+          "project-layout__body--without-rail": !hasTableOfContents,
+        },
+      ]}
+    >
+      {
+        hasTableOfContents && (
+          <aside class="project-layout__rail">
+            <TableOfContents
+              headings={tableOfContentsHeadings}
+              locale={locale}
+            />
+          </aside>
+        )
+      }
+      <div class="project-case-study prose" data-project-case-study>
         <slot />
       </div>
     </div>
@@ -182,6 +207,10 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
     line-height: 0.9;
   }
 
+  :global(html:lang(zh)) .project-layout h1 {
+    letter-spacing: -0.035em;
+  }
+
   .project-layout .lead {
     margin: 0;
   }
@@ -194,19 +223,20 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
   .project-layout__image,
   .project-hero-specimen {
     width: 100%;
-    min-height: clamp(28rem, 52vw, 43rem);
     border: 1px solid var(--color-border);
     background: var(--color-surface);
   }
 
   .project-layout__image {
     height: 100%;
+    min-height: clamp(28rem, 52vw, 43rem);
     object-fit: cover;
   }
 
   .project-hero-specimen {
     position: relative;
     display: grid;
+    min-height: clamp(20rem, 36vw, 30rem);
     overflow: hidden;
     align-content: space-between;
     padding: clamp(1.5rem, 4vw, 3rem);
@@ -288,62 +318,29 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
   .project-layout__rail {
     position: sticky;
     top: calc(var(--site-header-height) + 2rem);
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    color: var(--color-text-secondary);
-    font-family: var(--font-mono);
-    font-size: var(--font-size-xs);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
-  .project-case-study {
-    width: min(100%, var(--reading-width));
-  }
-
-  .project-case-study :global(h2) {
-    margin: clamp(4rem, 8vw, 7rem) 0 1.25rem;
-    padding-block-start: 1.25rem;
-    border-block-start: 1px solid var(--color-border);
-    font-size: var(--font-size-lg);
-    font-weight: 540;
-    letter-spacing: -0.035em;
-    line-height: 1.15;
-  }
-
-  .project-case-study :global(h2:first-child) {
-    margin-block-start: 0;
-  }
-
-  .project-case-study :global(p) {
-    margin: 0;
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-md);
-    line-height: 1.65;
-  }
-
-  .project-case-study :global(h2 + p) {
-    margin-block-start: 0;
-  }
-
-  .project-case-study :global(img),
-  .project-case-study :global(video),
-  .project-case-study :global(pre),
-  .project-case-study :global(table) {
-    max-width: 100%;
-    margin-block: 2rem;
-  }
-
-  .project-case-study :global(pre),
-  .project-case-study :global(table) {
-    overflow-x: auto;
+  .project-layout__body--without-rail {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
   }
 
   .project-layout__footer {
     display: flex;
     justify-content: flex-end;
     padding-block-start: clamp(4rem, 8vw, 7rem);
+  }
+
+  @media (max-width: 64rem) {
+    .project-layout__body {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
+    }
+
+    .project-layout__rail {
+      position: static;
+      width: min(100%, var(--reading-width));
+    }
   }
 
   @media (max-width: 56rem) {
@@ -354,18 +351,15 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .project-layout__image,
-    .project-hero-specimen {
+    .project-layout__image {
       min-height: clamp(22rem, 112vw, 36rem);
     }
 
-    .project-layout__facts,
-    .project-layout__body {
+    .project-layout__facts {
       grid-template-columns: minmax(0, 1fr);
     }
 
     .project-layout__rail {
-      position: static;
       padding-block-end: 1rem;
       border-block-end: 1px solid var(--color-border);
     }

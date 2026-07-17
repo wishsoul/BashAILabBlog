@@ -34,7 +34,7 @@ export const zh = {
     skipToMainContent: "跳至主要内容",
     breadcrumb: "面包屑",
     tableOfContents: "目录",
-    onThisPage: "本页内容",
+    onThisPage: "本页目录",
     backToTop: "返回顶部",
   },
   seo: {

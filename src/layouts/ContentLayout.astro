@@ -26,6 +26,10 @@ interface Props {
 const { entry, headings, minutes, translationPath } = Astro.props;
 const locale = entry.data.lang;
 const ui = getUi(locale);
+const tableOfContentsHeadings = headings.filter(
+  (heading) => heading.depth >= 2 && heading.depth <= 3,
+);
+const hasTableOfContents = tableOfContentsHeadings.length > 0;
 const publishedAt = entry.data.publishedAt;
 const publicationDate = publishedAt?.toISOString().slice(0, 10);
 const publicationLabel = publishedAt
@@ -95,11 +99,25 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
       />
     </section>
 
-    <div class="content-layout__body">
-      <aside class="content-layout__rail">
-        <TableOfContents headings={headings} locale={locale} />
-      </aside>
-      <div class="content-layout__prose" data-content-prose>
+    <div
+      class:list={[
+        "content-layout__body",
+        {
+          "content-layout__body--without-rail": !hasTableOfContents,
+        },
+      ]}
+    >
+      {
+        hasTableOfContents && (
+          <aside class="content-layout__rail">
+            <TableOfContents
+              headings={tableOfContentsHeadings}
+              locale={locale}
+            />
+          </aside>
+        )
+      }
+      <div class="content-layout__prose prose" data-content-prose>
         <slot />
       </div>
     </div>
@@ -135,6 +153,10 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
     line-height: 0.92;
   }
 
+  :global(html:lang(zh)) .content-layout h1 {
+    letter-spacing: -0.035em;
+  }
+
   .content-layout__metadata {
     display: flex;
     flex-wrap: wrap;
@@ -165,62 +187,9 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
     top: calc(var(--site-header-height) + 2rem);
   }
 
-  .content-layout__prose {
-    width: min(100%, var(--reading-width));
-  }
-
-  .content-layout__prose > :global(h2) {
-    margin: clamp(3.5rem, 7vw, 6rem) 0 1.25rem;
-    padding-block-start: 1.25rem;
-    border-block-start: 1px solid var(--color-border);
-    font-size: var(--font-size-lg);
-    font-weight: 540;
-    letter-spacing: -0.035em;
-    line-height: 1.15;
-  }
-
-  .content-layout__prose > :global(h2:first-child) {
-    margin-block-start: 0;
-  }
-
-  .content-layout__prose > :global(h3) {
-    margin: 2.5rem 0 1rem;
-    font-size: var(--font-size-md);
-    line-height: 1.25;
-  }
-
-  .content-layout__prose > :global(p),
-  .content-layout__prose > :global(ul) > :global(li),
-  .content-layout__prose > :global(ol) > :global(li) {
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-md);
-    line-height: 1.65;
-  }
-
-  .content-layout__prose > :global(p) {
-    margin: 0;
-  }
-
-  .content-layout__prose > :global(p + p) {
-    margin-block-start: 1.5rem;
-  }
-
-  .content-layout__prose > :global(ul),
-  .content-layout__prose > :global(ol) {
-    padding-inline-start: 1.25rem;
-  }
-
-  .content-layout__prose > :global(img),
-  .content-layout__prose > :global(video),
-  .content-layout__prose > :global(pre),
-  .content-layout__prose > :global(table) {
-    max-width: 100%;
-    margin-block: 2rem;
-  }
-
-  .content-layout__prose > :global(pre),
-  .content-layout__prose > :global(table) {
-    overflow-x: auto;
+  .content-layout__body--without-rail {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
   }
 
   .content-layout__footer {
@@ -229,15 +198,19 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
     padding-block-start: clamp(4rem, 8vw, 7rem);
   }
 
-  @media (max-width: 56rem) {
+  @media (max-width: 64rem) {
     .content-layout__body {
       grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
     }
 
     .content-layout__rail {
       position: static;
+      width: min(100%, var(--reading-width));
     }
+  }
 
+  @media (max-width: 56rem) {
     .content-layout__metadata :global(.tag-list) {
       width: 100%;
       margin-inline-start: 0;

@@ -119,6 +119,10 @@ test("resolves reduced-motion styles and accessible contrast-critical tokens", a
         token("--color-text-secondary"),
         background,
       );
+      ratios[`${theme}-reading-text`] = contrast(
+        token("--color-reading-text"),
+        background,
+      );
       ratios[`${theme}-accent`] = contrast(token("--color-accent"), background);
     }
 
@@ -127,8 +131,10 @@ test("resolves reduced-motion styles and accessible contrast-critical tokens", a
 
   expect(contrastRatios["light-text"]).toBeGreaterThanOrEqual(4.5);
   expect(contrastRatios["light-secondary-text"]).toBeGreaterThanOrEqual(4.5);
+  expect(contrastRatios["light-reading-text"]).toBeGreaterThanOrEqual(4.5);
   expect(contrastRatios["dark-text"]).toBeGreaterThanOrEqual(4.5);
   expect(contrastRatios["dark-secondary-text"]).toBeGreaterThanOrEqual(4.5);
+  expect(contrastRatios["dark-reading-text"]).toBeGreaterThanOrEqual(4.5);
   expect(contrastRatios["light-accent"]).toBeGreaterThanOrEqual(3);
   expect(contrastRatios["dark-accent"]).toBeGreaterThanOrEqual(3);
 });

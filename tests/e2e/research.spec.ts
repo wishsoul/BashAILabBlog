@@ -98,11 +98,15 @@ test("renders an article hierarchy, accessible table of contents, and callout", 
     }),
   ).toBeVisible();
   await expect(page.locator("[data-content-prose] h2")).toHaveCount(2);
+  await expect(page.locator("[data-content-prose]")).toHaveClass(/\bprose\b/u);
 
   const tableOfContents = page.getByRole("navigation", {
     name: "Table of contents",
   });
   await expect(tableOfContents).toBeVisible();
+  await expect(
+    tableOfContents.getByText("On this page", { exact: true }),
+  ).toBeVisible();
   await expect(
     tableOfContents.getByRole("link", { name: "Working question" }),
   ).toHaveAttribute("href", "#working-question");
@@ -110,6 +114,33 @@ test("renders an article hierarchy, accessible table of contents, and callout", 
     tableOfContents.getByRole("link", { name: "Validation remains explicit" }),
   ).toHaveAttribute("href", "#validation-remains-explicit");
   await expect(page.getByRole("note", { name: "Research note" })).toBeVisible();
+});
+
+test("reuses the shared prose system without flattening MDX callouts", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("./research/from-l3-to-l4-agentic-development/");
+
+  const prose = page.locator("[data-content-prose]");
+  await expect(prose).toHaveClass(/\bprose\b/u);
+
+  const callout = page.getByRole("note", { name: "Research note" });
+  const widths = await page.evaluate(() => {
+    const proseElement = document.querySelector<HTMLElement>(
+      "[data-content-prose]",
+    );
+    const calloutElement = document.querySelector<HTMLElement>("[role='note']");
+    if (!proseElement || !calloutElement)
+      throw new Error("Research prose fixtures are incomplete");
+    return {
+      callout: calloutElement.getBoundingClientRect().width,
+      prose: proseElement.getBoundingClientRect().width,
+    };
+  });
+
+  await expect(callout).toBeVisible();
+  expect(widths.callout).toBeLessThanOrEqual(widths.prose);
 });
 
 test("renders a static constraint flow only for its research article", async ({
@@ -141,4 +172,25 @@ test("marks Research current on archive and nested article routes", async ({
 
   await page.goto("./research/from-l3-to-l4-agentic-development/");
   await expect(researchLink).toHaveAttribute("aria-current", "page");
+});
+
+test("lets architecture figures exceed the reading column without widening quotes", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("./research/designing-constraint-system-ai-ui/");
+
+  const widths = await page.evaluate(() => {
+    const prose = document.querySelector<HTMLElement>("[data-content-prose]");
+    const flow = document.querySelector<HTMLElement>("[data-constraint-flow]");
+    if (!prose || !flow)
+      throw new Error("Wide-content fixtures are incomplete");
+    return {
+      flow: flow.getBoundingClientRect().width,
+      prose: prose.getBoundingClientRect().width,
+    };
+  });
+
+  expect(widths.flow).toBeGreaterThan(widths.prose);
+  expect(widths.flow).toBeLessThanOrEqual(832);
 });

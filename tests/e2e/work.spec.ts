@@ -177,3 +177,179 @@ test("preserves project source order and avoids overflow on a narrow screen", as
   }));
   expect(viewport.scrollWidth).toBe(viewport.clientWidth);
 });
+
+test("uses one readable type scale for Chinese Work prose", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("./zh/work/mac-native-kit/");
+
+  const prose = page.locator("[data-project-case-study]");
+  await expect(prose).toHaveClass(/\bprose\b/u);
+
+  const metrics = await prose.evaluate((container) => {
+    const paragraph = container.querySelector("h2 + p");
+    const nextParagraph = container.querySelector("p + p");
+    const listItem = container.querySelector("ul > li");
+    const heading = container.querySelector("h2");
+    if (!paragraph || !nextParagraph || !listItem || !heading)
+      throw new Error("MacNativeKit prose fixtures are incomplete");
+
+    const paragraphStyles = getComputedStyle(paragraph);
+    const nextParagraphRect = nextParagraph.getBoundingClientRect();
+    const previousParagraph = nextParagraph.previousElementSibling;
+    if (!(previousParagraph instanceof HTMLParagraphElement))
+      throw new Error("Expected adjacent paragraphs");
+    const previousParagraphRect = previousParagraph.getBoundingClientRect();
+    const listStyles = getComputedStyle(listItem);
+    const headingStyles = getComputedStyle(heading);
+
+    return {
+      gap: nextParagraphRect.top - previousParagraphRect.bottom,
+      headingFontSize: Number.parseFloat(headingStyles.fontSize),
+      headingFontWeight: Number.parseFloat(headingStyles.fontWeight),
+      listColor: listStyles.color,
+      listFontSize: listStyles.fontSize,
+      listLineHeight: listStyles.lineHeight,
+      paragraphColor: paragraphStyles.color,
+      paragraphFontSize: Number.parseFloat(paragraphStyles.fontSize),
+      paragraphLineHeight: paragraphStyles.lineHeight,
+      proseColor: getComputedStyle(container).color,
+      proseWidth: container.getBoundingClientRect().width,
+      readingColor: getComputedStyle(document.documentElement)
+        .getPropertyValue("--color-reading-text")
+        .trim(),
+    };
+  });
+
+  expect(metrics.proseWidth).toBeGreaterThanOrEqual(630);
+  expect(metrics.proseWidth).toBeLessThanOrEqual(650);
+  expect(metrics.paragraphFontSize).toBeGreaterThanOrEqual(18);
+  expect(metrics.paragraphFontSize).toBeLessThanOrEqual(20);
+  expect(metrics.listFontSize).toBe(`${metrics.paragraphFontSize}px`);
+  expect(metrics.listLineHeight).toBe(metrics.paragraphLineHeight);
+  expect(metrics.listColor).toBe(metrics.paragraphColor);
+  expect(metrics.paragraphColor).toBe(metrics.proseColor);
+  expect(metrics.readingColor).not.toBe("");
+  expect(metrics.gap).toBeGreaterThanOrEqual(24);
+  expect(metrics.gap).toBeLessThanOrEqual(30);
+  expect(metrics.headingFontSize).toBeGreaterThanOrEqual(30);
+  expect(metrics.headingFontWeight).toBeGreaterThanOrEqual(600);
+});
+
+test("renders dark Work prose with the reading token and a distinct code surface", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.addInitScript(() => localStorage.removeItem("theme"));
+  await page.goto("./zh/work/mac-native-kit/");
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  const colors = await page.evaluate(() => {
+    const prose = document.querySelector<HTMLElement>(
+      "[data-project-case-study]",
+    );
+    const paragraph = prose?.querySelector("p");
+    const codeBlock = prose?.querySelector("pre");
+    if (!prose || !paragraph || !codeBlock)
+      throw new Error("Dark Work prose fixtures are incomplete");
+    return {
+      background: getComputedStyle(document.body).backgroundColor,
+      codeBackground: getComputedStyle(codeBlock).backgroundColor,
+      paragraph: getComputedStyle(paragraph).color,
+      prose: getComputedStyle(prose).color,
+    };
+  });
+
+  expect(colors.paragraph).toBe(colors.prose);
+  expect(colors.codeBackground).not.toBe(colors.background);
+});
+
+test("generates an indexed English Work table of contents from Markdown headings", async ({
+  page,
+}) => {
+  await page.goto("./work/mac-native-kit/");
+
+  const contents = page.getByRole("navigation", {
+    name: "Table of contents",
+  });
+  await expect(contents).toBeVisible();
+  await expect(
+    contents.getByText("On this page", { exact: true }),
+  ).toBeVisible();
+
+  const links = contents.getByRole("link");
+  await expect(links).toHaveCount(10);
+  await expect(links).toHaveText([
+    "Problem",
+    "Insight",
+    "Product Strategy",
+    "Solution",
+    "AI / Technical Approach",
+    "My Role",
+    "Artifacts",
+    "Results",
+    "Learnings",
+    "Next Step",
+  ]);
+
+  const hrefs = await links.evaluateAll((anchors) =>
+    anchors.map((anchor) => anchor.getAttribute("href")),
+  );
+  expect(
+    await page.evaluate(
+      (targets) =>
+        targets.every(
+          (target) =>
+            target?.startsWith("#") && document.getElementById(target.slice(1)),
+        ),
+      hrefs,
+    ),
+  ).toBe(true);
+
+  const indexes = await contents
+    .locator(".table-of-contents__index")
+    .evaluateAll((nodes) => nodes.map((node) => node.textContent?.trim()));
+  expect(indexes).toEqual([
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+  ]);
+});
+
+test("localizes the Chinese Work table of contents", async ({ page }) => {
+  await page.goto("./zh/work/mac-native-kit/");
+
+  const contents = page.getByRole("navigation", { name: "目录" });
+  await expect(contents).toBeVisible();
+  await expect(contents.getByText("本页目录", { exact: true })).toBeVisible();
+  await expect(contents.getByRole("link")).toHaveCount(10);
+  await expect(contents.getByRole("link", { name: "问题" })).toHaveAttribute(
+    "href",
+    "#问题",
+  );
+});
+
+test("reduces the no-cover project specimen without changing its design", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("./work/mac-native-kit/");
+
+  const specimen = page.locator(".project-hero-specimen");
+  await expect(specimen).toBeVisible();
+  const height = await specimen.evaluate(
+    (element) => element.getBoundingClientRect().height,
+  );
+  expect(height).toBeGreaterThanOrEqual(320);
+  expect(height).toBeLessThanOrEqual(481);
+  await expect(specimen).toContainText("01");
+  await expect(specimen).toContainText("MacNativeKit");
+});

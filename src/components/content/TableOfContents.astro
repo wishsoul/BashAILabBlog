@@ -15,9 +15,14 @@ interface Props {
 
 const { headings, locale = "en" } = Astro.props;
 const ui = getUi(locale);
-const items = headings.filter(
-  (heading) => heading.depth >= 2 && heading.depth <= 3,
-);
+let sectionIndex = 0;
+const items = headings
+  .filter((heading) => heading.depth >= 2 && heading.depth <= 3)
+  .map((heading) => ({
+    ...heading,
+    index:
+      heading.depth === 2 ? String(++sectionIndex).padStart(2, "0") : undefined,
+  }));
 ---
 
 {
@@ -32,6 +37,9 @@ const items = headings.filter(
           <li
             class:list={{ "table-of-contents__subitem": heading.depth === 3 }}
           >
+            <span class="table-of-contents__index" aria-hidden="true">
+              {heading.index ?? ""}
+            </span>
             <a href={`#${heading.slug}`}>{heading.text}</a>
           </li>
         ))}
@@ -42,8 +50,8 @@ const items = headings.filter(
 
 <style>
   .table-of-contents {
-    border-inline-start: 1px solid var(--color-border);
     padding-inline-start: 1rem;
+    border-inline-start: 1px solid var(--color-border);
   }
 
   .table-of-contents > p {
@@ -52,10 +60,23 @@ const items = headings.filter(
 
   .table-of-contents ol {
     display: grid;
-    gap: 0.5rem;
+    gap: 0.6rem;
     padding: 0;
     margin: 0;
     list-style: none;
+  }
+
+  .table-of-contents li {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: baseline;
+  }
+
+  .table-of-contents__index {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
   }
 
   .table-of-contents a {
@@ -73,5 +94,9 @@ const items = headings.filter(
 
   .table-of-contents__subitem {
     padding-inline-start: 0.75rem;
+  }
+
+  .table-of-contents__subitem .table-of-contents__index::before {
+    content: "—";
   }
 </style>

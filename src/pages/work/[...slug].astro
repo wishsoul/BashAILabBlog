@@ -23,9 +23,13 @@ interface Props {
 }
 
 const { entry, translationPath: counterpartPath } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 ---
 
-<ProjectLayout entry={entry} translationPath={counterpartPath}>
+<ProjectLayout
+  entry={entry}
+  headings={headings}
+  translationPath={counterpartPath}
+>
   <Content />
 </ProjectLayout>

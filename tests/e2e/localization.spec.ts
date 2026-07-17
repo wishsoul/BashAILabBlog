@@ -32,7 +32,7 @@ test("renders Chinese shared UI labels and home SEO", async ({ page }) => {
   const tableOfContents = page.getByRole("navigation", { name: "目录" });
   await expect(tableOfContents).toBeVisible();
   await expect(
-    tableOfContents.getByText("本页内容", { exact: true }),
+    tableOfContents.getByText("本页目录", { exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("navigation", { name: "面包屑" })).toBeVisible();
   await expect(page.getByRole("link", { name: "返回顶部" })).toHaveCount(1);
@@ -46,7 +46,7 @@ test("keeps WordGrill platform metadata canonical while rendering it in Chinese"
   await expect(page.locator("[data-project-metadata]")).toContainText(
     "iOS 和 macOS",
   );
-  await expect(page.locator(".project-layout__rail")).toContainText("案例研究");
+  await expect(page.locator(".project-layout__rail")).toContainText("本页目录");
 
   const jsonLd = await page
     .locator('script[type="application/ld+json"]')

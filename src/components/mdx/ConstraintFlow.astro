@@ -7,7 +7,11 @@ interface Props {
 const { label, steps } = Astro.props;
 ---
 
-<figure class="constraint-flow" data-constraint-flow aria-label={label}>
+<figure
+  class="constraint-flow prose-wide"
+  data-constraint-flow
+  aria-label={label}
+>
   <figcaption>{label}</figcaption>
   <ol>
     {
