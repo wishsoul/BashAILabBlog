@@ -36,7 +36,9 @@ const ui = getUi(lang);
         {
           ui.hero.focusAreas.map((area, index) => (
             <li>
-              <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+              <span aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
               {area}
             </li>
           ))
