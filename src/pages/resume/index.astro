@@ -11,6 +11,6 @@ if (!entry) throw new Error("Missing approved Resume page content.");
 const { Content } = await render(entry);
 ---
 
-<EditorialPage entry={entry}>
+<EditorialPage entry={entry} translationPath="/zh/resume/">
   <Content />
 </EditorialPage>

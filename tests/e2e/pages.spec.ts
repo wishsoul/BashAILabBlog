@@ -63,30 +63,25 @@ test("renders the supplied Resume without unsupported employment or credential s
   );
 });
 
-test("renders the Chinese preparation status without translated content", async ({
-  page,
-}) => {
+test("publishes the Chinese home and content archives", async ({ page }) => {
   await page.goto("./zh/");
 
   await expect(page.locator("html")).toHaveAttribute("lang", "zh");
   await expect(
-    page.getByRole("heading", { name: "中文版正在准备中。" }),
+    page.getByRole("heading", { level: 1, name: /帮助个人/ }),
   ).toBeVisible();
+  await page.goto("./zh/work/");
   await expect(
-    page.getByText(
-      "经过审核的中文内容将在准备完成后发布。你现在仍可访问完整的英文版。",
-    ),
+    page.getByRole("heading", { level: 1, name: "作品" }),
   ).toBeVisible();
-  const editionStatus = page.locator("main .edition-status");
-  await expect(editionStatus.locator("h1, h2, h3, h4, h5, h6")).toHaveCount(1);
-  await expect(editionStatus.locator("p")).toHaveCount(2);
+  await page.goto("./zh/research/");
   await expect(
-    editionStatus.locator("[data-page-content], ul, ol"),
-  ).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "访问英文版" })).toHaveAttribute(
-    "href",
-    "/BashAILabBlog/",
-  );
+    page.getByRole("heading", { level: 1, name: "研究" }),
+  ).toBeVisible();
+  await page.goto("./zh/log/");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "日志" }),
+  ).toBeVisible();
 });
 
 test("renders a base-safe home link on the 404 page", async ({ page }) => {

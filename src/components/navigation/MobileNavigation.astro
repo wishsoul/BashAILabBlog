@@ -2,6 +2,7 @@
 import type { Locale } from "../../config/site";
 import { NAV_ITEMS, SITE } from "../../config/site";
 import { getUi } from "../../i18n";
+import { localizedPath } from "../../lib/localized-content";
 import { withBase } from "../../lib/urls";
 import ExternalLink from "../content/ExternalLink.astro";
 
@@ -42,19 +43,22 @@ const isCurrent = (href: string) => {
     <nav aria-label={ui.header.mobileNavigation}>
       <ul class="site-frame mobile-navigation__list">
         {
-          NAV_ITEMS.map((item, index) => (
-            <li>
-              <span class="mobile-navigation__index" aria-hidden="true">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <a
-                href={withBase(item.href)}
-                aria-current={isCurrent(item.href) ? "page" : undefined}
-              >
-                {ui.nav[item.key]}
-              </a>
-            </li>
-          ))
+          NAV_ITEMS.map((item, index) => {
+            const href = localizedPath(lang, item.href);
+            return (
+              <li>
+                <span class="mobile-navigation__index" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <a
+                  href={withBase(href)}
+                  aria-current={isCurrent(href) ? "page" : undefined}
+                >
+                  {ui.nav[item.key]}
+                </a>
+              </li>
+            );
+          })
         }
         <li>
           <span class="mobile-navigation__index" aria-hidden="true">05</span>

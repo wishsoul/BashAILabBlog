@@ -1,12 +1,15 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import type { Locale } from "../../config/site";
+import { displayContentLabel } from "../../lib/content-labels";
 import StatusIndicator from "./StatusIndicator.astro";
 
 interface Props {
   entries: CollectionEntry<"work">[];
+  locale?: Locale;
 }
 
-const { entries } = Astro.props;
+const { entries, locale = "en" } = Astro.props;
 ---
 
 <ul class="lab-status">
@@ -18,9 +21,10 @@ const { entries } = Astro.props;
         </span>
         <strong data-status-project>{entry.data.title}</strong>
         <span class="lab-status__scope">
-          {entry.data.category} / {entry.data.platform}
+          {displayContentLabel(locale, entry.data.category)} /{" "}
+          {displayContentLabel(locale, entry.data.platform)}
         </span>
-        <StatusIndicator status={entry.data.status} />
+        <StatusIndicator status={entry.data.status} locale={locale} />
       </li>
     ))
   }

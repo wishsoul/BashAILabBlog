@@ -9,7 +9,7 @@ export const SITE = {
   basePath: import.meta.env.PUBLIC_BASE_PATH ?? "/BashAILabBlog",
   defaultLocale: "en" as const,
   locales: ["en", "zh"] as const,
-  github: "https://github.com/bashxu",
+  github: "https://github.com/wishsoul",
   email: import.meta.env.PUBLIC_EMAIL || null,
   resumeDownload: import.meta.env.PUBLIC_RESUME_PATH || null,
 } as const;

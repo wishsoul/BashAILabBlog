@@ -1,9 +1,13 @@
 ---
+import type { Locale } from "../../config/site";
+import { displayContentLabel } from "../../lib/content-labels";
+
 interface Props {
   status: string;
+  locale?: Locale;
 }
 
-const { status } = Astro.props;
+const { status, locale = "en" } = Astro.props;
 ---
 
 <span
@@ -12,7 +16,7 @@ const { status } = Astro.props;
   data-status-value
 >
   <span class="status-indicator__dot" aria-hidden="true"></span>
-  {status}
+  {displayContentLabel(locale, status)}
 </span>
 
 <style>

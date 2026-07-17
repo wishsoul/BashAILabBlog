@@ -1,18 +1,17 @@
 ---
+import type { Locale } from "../../config/site";
+import { getUi } from "../../i18n";
+import { localizedPath } from "../../lib/localized-content";
 import { withBase } from "../../lib/urls";
 
 interface Props {
   exploreWorkLabel: string;
   readResearchLabel: string;
+  lang?: Locale;
 }
 
-const { exploreWorkLabel, readResearchLabel } = Astro.props;
-const focusAreas = [
-  "AI Product Research",
-  "Agentic Development",
-  "Native Software",
-  "Independent Products",
-];
+const { exploreWorkLabel, readResearchLabel, lang = "en" } = Astro.props;
+const ui = getUi(lang);
 ---
 
 <section
@@ -21,23 +20,20 @@ const focusAreas = [
   aria-labelledby="home-title"
 >
   <div class="hero__heading flow">
-    <p class="meta-label">Bash AI Lab / Independent Research Practice</p>
+    <p class="meta-label">{ui.hero.eyebrow}</p>
     <h1 id="home-title" class="display-title">
-      Building systems that help<br />
-      one person create software<br />
-      with AI.
+      {ui.hero.title}
     </h1>
   </div>
 
   <div class="hero__context">
     <p class="hero__lead lead" data-hero-lead>
-      I research how AI agents, product systems, and constrained interfaces turn
-      ideas into production-ready software.
+      {ui.hero.description}
     </p>
 
-    <ul class="hero__focus" aria-label="Research areas">
+    <ul class="hero__focus" aria-label={ui.hero.researchAreas}>
       {
-        focusAreas.map((area, index) => (
+        ui.hero.focusAreas.map((area, index) => (
           <li>
             <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
             {area}
@@ -47,12 +43,12 @@ const focusAreas = [
     </ul>
 
     <div class="hero__footer">
-      <p class="meta-label">Based in Shenzhen / Working globally</p>
-      <nav class="hero__actions" aria-label="Homepage introduction">
-        <a href={withBase("/work/")}>
+      <p class="meta-label">{ui.hero.location}</p>
+      <nav class="hero__actions" aria-label={ui.hero.introduction}>
+        <a href={withBase(localizedPath(lang, "/work/"))}>
           {exploreWorkLabel}<span aria-hidden="true">↗</span>
         </a>
-        <a href={withBase("/research/")}>
+        <a href={withBase(localizedPath(lang, "/research/"))}>
           {readResearchLabel}<span aria-hidden="true">↗</span>
         </a>
       </nav>

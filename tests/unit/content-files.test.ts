@@ -57,6 +57,15 @@ describe("launch content files", () => {
     }
   });
 
+  it("keeps WordGrill platform metadata canonical for structured data", () => {
+    const source = readFileSync(
+      new URL("../../src/content/work/zh/wordgrill.mdx", import.meta.url),
+      "utf8",
+    );
+
+    expect(source).toMatch(/^platform: iOS and macOS$/mu);
+  });
+
   it("keeps undated Research drafts isolated from published articles", () => {
     const draftFiles = [
       "github-issues-source-of-truth.mdx",

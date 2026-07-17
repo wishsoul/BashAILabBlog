@@ -1,4 +1,5 @@
 export interface UiCopy {
+  brand: string;
   nav: {
     work: string;
     research: string;
@@ -23,6 +24,51 @@ export interface UiCopy {
     rss: string;
     copyright: string;
     builtWithAstro: string;
+  };
+  breadcrumb: {
+    home: string;
+  };
+  accessibility: {
+    skipToMainContent: string;
+    breadcrumb: string;
+    tableOfContents: string;
+    onThisPage: string;
+    backToTop: string;
+  };
+  seo: {
+    homeTitle: string;
+    homeDescription: string;
+  };
+  archive: {
+    filterByCategory: string;
+    allProjectsShown: string;
+  };
+  hero: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    researchAreas: string;
+    focusAreas: readonly string[];
+    location: string;
+    introduction: string;
+  };
+  metadata: {
+    publicationDetails: string;
+    minutesRead: string;
+    tags: (title: string) => string;
+    status: string;
+    category: string;
+    platform: string;
+    role: string;
+    year: string;
+    started: string;
+    projectInformation: string;
+  };
+  project: {
+    featuredWork: string;
+    view: string;
+    demo: string;
+    caseStudy: string;
   };
   cta: {
     exploreWork: string;
@@ -63,6 +109,7 @@ export interface UiCopy {
 }
 
 export const en = {
+  brand: "Bash AI Lab",
   nav: {
     work: "Work",
     research: "Research",
@@ -88,6 +135,58 @@ export const en = {
     rss: "RSS",
     copyright: "All rights reserved.",
     builtWithAstro: "Built with Astro",
+  },
+  breadcrumb: {
+    home: "Home",
+  },
+  accessibility: {
+    skipToMainContent: "Skip to main content",
+    breadcrumb: "Breadcrumb",
+    tableOfContents: "Table of contents",
+    onThisPage: "On this page",
+    backToTop: "Back to top",
+  },
+  seo: {
+    homeTitle: "Bash AI Lab — AI Product Research & Independent Software",
+    homeDescription:
+      "AI product research, agentic development systems and independent software built by Bash.",
+  },
+  archive: {
+    filterByCategory: "Filter by category",
+    allProjectsShown: "All projects are shown.",
+  },
+  hero: {
+    eyebrow: "Bash AI Lab / Independent Research Practice",
+    title: "Building systems that help one person create software with AI.",
+    description:
+      "I research how AI agents, product systems, and constrained interfaces turn ideas into production-ready software.",
+    researchAreas: "Research areas",
+    focusAreas: [
+      "AI Product Research",
+      "Agentic Development",
+      "Native Software",
+      "Independent Products",
+    ],
+    location: "Based in Shenzhen / Working globally",
+    introduction: "Homepage introduction",
+  },
+  metadata: {
+    publicationDetails: "Publication details",
+    minutesRead: "min read",
+    tags: (title) => `${title} tags`,
+    status: "Status",
+    category: "Category",
+    platform: "Platform",
+    role: "Role",
+    year: "Year",
+    started: "Started",
+    projectInformation: "Project information",
+  },
+  project: {
+    featuredWork: "Featured Work",
+    view: "View",
+    demo: "Demo",
+    caseStudy: "Case study",
   },
   cta: {
     exploreWork: "Explore Work",

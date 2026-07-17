@@ -3,6 +3,7 @@ import "@fontsource-variable/geist/index.css";
 import "@fontsource-variable/geist-mono/index.css";
 import type { Locale } from "../config/site";
 import { SITE } from "../config/site";
+import { getUi } from "../i18n";
 import SiteFooter from "../components/layout/SiteFooter.astro";
 import SiteHeader from "../components/navigation/SiteHeader.astro";
 import {
@@ -38,7 +39,11 @@ const {
   translationPath,
   openGraphType = "website",
 } = Astro.props;
-const pageTitle = title.includes(SITE.name) ? title : `${title} — ${SITE.name}`;
+const ui = getUi(lang);
+const pageTitle =
+  title.includes(SITE.name) || title.includes(ui.brand)
+    ? title
+    : `${title} — ${ui.brand}`;
 const canonicalUrl = buildCanonical(canonicalPath);
 const socialImageUrl = absoluteUrl(image ?? DEFAULT_OG_IMAGE);
 const faviconUrl = withBase("/favicon.svg");
@@ -125,7 +130,9 @@ const serializedJsonLd = JSON.stringify(jsonLdEntries).replaceAll(
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <a class="skip-link" href="#main-content">
+      {ui.accessibility.skipToMainContent}
+    </a>
     <SiteHeader lang={lang} translationPath={translationPath} />
     <main id="main-content" tabindex="-1">
       <slot />

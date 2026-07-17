@@ -1,12 +1,15 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import type { Locale } from "../../config/site";
 import { contentSlug } from "../../lib/content";
+import { displayContentLabel } from "../../lib/content-labels";
 
 interface Props {
   entries: CollectionEntry<"log">[];
+  locale?: Locale;
 }
 
-const { entries } = Astro.props;
+const { entries, locale = "en" } = Astro.props;
 const groups = new Map<string, CollectionEntry<"log">[]>();
 
 for (const entry of entries) {
@@ -40,7 +43,9 @@ const formatDate = (date: Date) =>
                 class="log-timeline__entry"
                 data-log-entry
               >
-                <p class="log-timeline__meta meta-label">{entry.data.type}</p>
+                <p class="log-timeline__meta meta-label">
+                  {displayContentLabel(locale, entry.data.type)}
+                </p>
                 <h2>{entry.data.title}</h2>
                 <p>{entry.data.summary}</p>
               </article>

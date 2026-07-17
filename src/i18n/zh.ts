@@ -1,6 +1,7 @@
 import type { UiCopy } from "./en";
 
 export const zh = {
+  brand: "Bash AI 实验室",
   nav: {
     work: "作品",
     research: "研究",
@@ -25,6 +26,53 @@ export const zh = {
     rss: "RSS",
     copyright: "保留所有权利。",
     builtWithAstro: "使用 Astro 构建",
+  },
+  breadcrumb: {
+    home: "首页",
+  },
+  accessibility: {
+    skipToMainContent: "跳至主要内容",
+    breadcrumb: "面包屑",
+    tableOfContents: "目录",
+    onThisPage: "本页内容",
+    backToTop: "返回顶部",
+  },
+  seo: {
+    homeTitle: "Bash AI 实验室 — AI 产品研究与独立软件",
+    homeDescription:
+      "Bash AI 实验室的 AI 产品研究、智能体开发系统与独立软件实践。",
+  },
+  archive: {
+    filterByCategory: "按类别筛选",
+    allProjectsShown: "显示所有项目。",
+  },
+  hero: {
+    eyebrow: "Bash AI 实验室 / 独立研究实践",
+    title: "构建帮助个人借助 AI 创造软件的系统。",
+    description:
+      "我研究 AI 智能体、产品系统和受约束的界面如何将想法转化为可上线的软件。",
+    researchAreas: "研究方向",
+    focusAreas: ["AI 产品研究", "智能体开发", "原生软件", "独立产品"],
+    location: "立足深圳 / 服务全球",
+    introduction: "首页介绍",
+  },
+  metadata: {
+    publicationDetails: "发布信息",
+    minutesRead: "分钟阅读",
+    tags: (title) => `${title} 的标签`,
+    status: "状态",
+    category: "类别",
+    platform: "平台",
+    role: "职责",
+    year: "年份",
+    started: "开始时间",
+    projectInformation: "项目信息",
+  },
+  project: {
+    featuredWork: "精选作品",
+    view: "查看",
+    demo: "演示",
+    caseStudy: "案例研究",
   },
   cta: {
     exploreWork: "查看作品",

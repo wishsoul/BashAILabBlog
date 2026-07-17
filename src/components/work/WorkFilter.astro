@@ -1,14 +1,20 @@
 ---
+import type { Locale } from "../../config/site";
+import { getUi } from "../../i18n";
+import { displayContentLabel } from "../../lib/content-labels";
+
 interface Props {
   categories: readonly string[];
+  locale?: Locale;
 }
 
-const { categories } = Astro.props;
+const { categories, locale = "en" } = Astro.props;
+const ui = getUi(locale);
 const filters = ["All", ...categories];
 ---
 
 <div class="work-filter" data-work-filter>
-  <p id="work-filter-label" class="meta-label">Filter by category</p>
+  <p id="work-filter-label" class="meta-label">{ui.archive.filterByCategory}</p>
   <div class="work-filter__controls" aria-labelledby="work-filter-label">
     {
       filters.map((filter) => (
@@ -18,13 +24,15 @@ const filters = ["All", ...categories];
           data-category={filter}
           aria-pressed={filter === "All" ? "true" : "false"}
         >
-          {filter}
+          {filter === "All"
+            ? ui.status.all
+            : displayContentLabel(locale, filter)}
         </button>
       ))
     }
   </div>
   <noscript>
-    <p class="work-filter__note">All projects are shown.</p>
+    <p class="work-filter__note">{ui.archive.allProjectsShown}</p>
   </noscript>
 </div>
 

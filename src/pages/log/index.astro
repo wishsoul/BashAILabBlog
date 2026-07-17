@@ -16,6 +16,7 @@ const entries = visibleEntries(
   description="Build notes, research decisions, experiments, and changelog entries from Bash AI Lab."
   lang="en"
   canonicalPath="/log/"
+  translationPath="/zh/log/"
 >
   <article class="site-frame log-page">
     <header class="log-page__header">
@@ -26,7 +27,7 @@ const entries = visibleEntries(
       </p>
     </header>
 
-    <LogTimeline entries={entries} />
+    <LogTimeline entries={entries} locale="en" />
   </article>
 </BaseLayout>
 

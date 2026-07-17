@@ -1,0 +1,132 @@
+---
+import { getCollection } from "astro:content";
+import ArticleListItem from "../../../components/content/ArticleListItem.astro";
+import ResearchIndex from "../../../components/content/ResearchIndex.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { sortByOrderThenDate, visibleEntries } from "../../../lib/content";
+
+const allResearch = await getCollection("research");
+const research = visibleEntries(
+  allResearch.filter((entry) => entry.data.lang === "zh"),
+  import.meta.env.PROD,
+);
+const themes = [...research]
+  .filter((entry) => entry.data.kind === "theme")
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, "zh-CN"));
+const articles = sortByOrderThenDate(
+  research.filter((entry) => entry.data.kind === "article"),
+);
+---
+
+<BaseLayout
+  title="研究"
+  description="Bash AI 实验室的研究笔记、框架与主题。"
+  lang="zh"
+  canonicalPath="/zh/research/"
+  translationPath="/research/"
+>
+  <div class="site-frame research-archive">
+    <header class="research-archive__header">
+      <p class="meta-label">笔记 / 框架 / 产品系统</p>
+      <h1 class="display-title">研究</h1>
+      <p class="lead">
+        探索智能体开发、AI 原生界面，以及连接产品方向与实现的系统。
+      </p>
+    </header>
+
+    <section class="research-archive__themes" aria-labelledby="research-themes">
+      <div class="research-archive__section-heading">
+        <p class="meta-label">主题</p>
+        <h2 id="research-themes">研究方向</h2>
+      </div>
+      <ResearchIndex entries={themes} locale="zh" />
+    </section>
+
+    <section
+      class="research-archive__articles"
+      aria-labelledby="research-articles"
+    >
+      <div class="research-archive__section-heading">
+        <p class="meta-label">文章</p>
+        <h2 id="research-articles">已发布笔记</h2>
+      </div>
+      <ol class="research-archive__article-list">
+        {articles.map((entry) => <ArticleListItem entry={entry} locale="zh" />)}
+      </ol>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .research-archive {
+    padding-block: clamp(4rem, 9vw, 8rem) clamp(5rem, 10vw, 9rem);
+  }
+
+  .research-archive__header {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(18rem, 1.15fr);
+    gap: 1rem clamp(2rem, 8vw, 8rem);
+    align-items: end;
+    padding-block-end: clamp(4rem, 9vw, 8rem);
+  }
+
+  .research-archive__header > .meta-label {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+
+  .research-archive__header h1,
+  .research-archive__header .lead {
+    margin: 0;
+  }
+
+  .research-archive__themes,
+  .research-archive__articles {
+    padding-block-start: clamp(3rem, 7vw, 6rem);
+  }
+
+  .research-archive__articles {
+    margin-block-start: clamp(3rem, 8vw, 7rem);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .research-archive__section-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: baseline;
+    padding-block-end: 1.5rem;
+  }
+
+  .research-archive__section-heading p,
+  .research-archive__section-heading h2 {
+    margin: 0;
+  }
+
+  .research-archive__section-heading h2 {
+    font-size: var(--font-size-md);
+    font-weight: 540;
+    letter-spacing: -0.03em;
+  }
+
+  .research-archive__article-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 46rem) {
+    .research-archive__header {
+      grid-template-columns: 1fr;
+    }
+
+    .research-archive__header > .meta-label {
+      grid-column: 1;
+    }
+
+    .research-archive__section-heading {
+      display: grid;
+      gap: 0.5rem;
+    }
+  }
+</style>

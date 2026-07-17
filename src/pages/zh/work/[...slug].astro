@@ -1,0 +1,31 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import ProjectLayout from "../../../layouts/ProjectLayout.astro";
+import { contentSlug, visibleEntries } from "../../../lib/content";
+import { translationPath } from "../../../lib/localized-content";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("work");
+  return visibleEntries(entries, import.meta.env.PROD)
+    .filter((entry) => entry.data.lang === "zh")
+    .map((entry) => ({
+      params: { slug: contentSlug(entry.id) },
+      props: {
+        entry,
+        translationPath: translationPath(entries, entry, "work"),
+      },
+    }));
+}
+
+interface Props {
+  entry: CollectionEntry<"work">;
+  translationPath?: string;
+}
+
+const { entry, translationPath: counterpartPath } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<ProjectLayout entry={entry} translationPath={counterpartPath}>
+  <Content />
+</ProjectLayout>

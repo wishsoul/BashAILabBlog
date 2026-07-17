@@ -23,6 +23,7 @@ const articles = sortByOrderThenDate(
   description="Research notes, frameworks, and themes from Bash AI Lab."
   lang="en"
   canonicalPath="/research/"
+  translationPath="/zh/research/"
 >
   <div class="site-frame research-archive">
     <header class="research-archive__header">
@@ -39,7 +40,7 @@ const articles = sortByOrderThenDate(
         <p class="meta-label">Themes</p>
         <h2 id="research-themes">Research directions</h2>
       </div>
-      <ResearchIndex entries={themes} />
+      <ResearchIndex entries={themes} locale="en" />
     </section>
 
     <section
@@ -51,7 +52,7 @@ const articles = sortByOrderThenDate(
         <h2 id="research-articles">Published notes</h2>
       </div>
       <ol class="research-archive__article-list">
-        {articles.map((entry) => <ArticleListItem entry={entry} />)}
+        {articles.map((entry) => <ArticleListItem entry={entry} locale="en" />)}
       </ol>
     </section>
   </div>

@@ -6,7 +6,6 @@ import HeroSection from "../components/layout/HeroSection.astro";
 import SectionHeader from "../components/layout/SectionHeader.astro";
 import LabStatus from "../components/work/LabStatus.astro";
 import ProjectFeature from "../components/work/ProjectFeature.astro";
-import { SITE } from "../config/site";
 import { getUi } from "../i18n";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
@@ -36,10 +35,11 @@ const latestResearch = visibleResearch
 ---
 
 <BaseLayout
-  title={SITE.title}
-  description={SITE.description}
+  title={ui.seo.homeTitle}
+  description={ui.seo.homeDescription}
   lang="en"
   canonicalPath="/"
+  translationPath="/zh/"
 >
   <HeroSection
     exploreWorkLabel={ui.cta.exploreWork}
@@ -57,7 +57,7 @@ const latestResearch = visibleResearch
       label="Research Index"
       title="Current Research"
     />
-    <ResearchIndex entries={researchThemes} />
+    <ResearchIndex entries={researchThemes} locale="en" />
   </section>
 
   <section
@@ -78,6 +78,7 @@ const latestResearch = visibleResearch
             entry={entry}
             index={index}
             linkLabel={ui.cta.viewProject}
+            locale="en"
           />
         ))
       }
@@ -96,7 +97,11 @@ const latestResearch = visibleResearch
       title="Latest Research"
     />
     <ol class="latest-research">
-      {latestResearch.map((entry) => <ArticleListItem entry={entry} />)}
+      {
+        latestResearch.map((entry) => (
+          <ArticleListItem entry={entry} locale="en" />
+        ))
+      }
     </ol>
   </section>
 
@@ -111,7 +116,7 @@ const latestResearch = visibleResearch
       label="Now Building"
       title="Lab Status"
     />
-    <LabStatus entries={visibleWork} />
+    <LabStatus entries={visibleWork} locale="en" />
   </section>
 </BaseLayout>
 

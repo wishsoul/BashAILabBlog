@@ -1,5 +1,30 @@
 import { expect, test } from "@playwright/test";
 
+test("uses the Chinese profile URL in every global GitHub link", async ({
+  page,
+}) => {
+  await page.goto("./");
+  await expect(
+    page
+      .getByRole("navigation", { name: "Primary" })
+      .getByRole("link", { name: "GitHub" }),
+  ).toHaveAttribute("href", "https://github.com/wishsoul");
+  await expect(
+    page.locator("footer").getByRole("link", { name: "GitHub" }),
+  ).toHaveAttribute("href", "https://github.com/wishsoul");
+});
+
+test("keeps Chinese navigation inside the Chinese edition", async ({
+  page,
+}) => {
+  await page.goto("./zh/");
+  await expect(
+    page
+      .getByRole("navigation", { name: "主导航" })
+      .getByRole("link", { name: "作品" }),
+  ).toHaveAttribute("href", "/BashAILabBlog/zh/work/");
+});
+
 test("desktop navigation identifies the current page and keeps internal links base-safe", async ({
   page,
 }) => {

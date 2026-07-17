@@ -1,55 +1,146 @@
 ---
+import { getCollection } from "astro:content";
+import ArticleListItem from "../../components/content/ArticleListItem.astro";
+import ResearchIndex from "../../components/content/ResearchIndex.astro";
+import HeroSection from "../../components/layout/HeroSection.astro";
+import SectionHeader from "../../components/layout/SectionHeader.astro";
+import LabStatus from "../../components/work/LabStatus.astro";
+import ProjectFeature from "../../components/work/ProjectFeature.astro";
 import { getUi } from "../../i18n";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { withBase } from "../../lib/urls";
 
 const ui = getUi("zh");
+const [allWork, allResearch] = await Promise.all([
+  getCollection("work"),
+  getCollection("research"),
+]);
+
+const visibleWork = allWork
+  .filter((entry) => entry.data.lang === "zh" && !entry.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+const selectedWork = visibleWork.filter((entry) => entry.data.featured);
+const visibleResearch = allResearch.filter(
+  (entry) => entry.data.lang === "zh" && !entry.data.draft,
+);
+const researchThemes = visibleResearch
+  .filter((entry) => entry.data.kind === "theme" && entry.data.featured)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, "zh-CN"));
+const latestResearch = visibleResearch
+  .filter((entry) => entry.data.kind === "article" && entry.data.publishedAt)
+  .sort(
+    (a, b) =>
+      (b.data.publishedAt?.getTime() ?? 0) -
+      (a.data.publishedAt?.getTime() ?? 0),
+  );
 ---
 
 <BaseLayout
-  title={ui.editionStatus.title}
-  description={ui.editionStatus.description}
+  title={ui.seo.homeTitle}
+  description={ui.seo.homeDescription}
   lang="zh"
   canonicalPath="/zh/"
+  translationPath="/"
 >
-  <article class="site-frame edition-status">
-    <p class="meta-label">{ui.editionStatus.eyebrow}</p>
-    <h1 class="display-title">{ui.editionStatus.title}</h1>
-    <p class="lead">{ui.editionStatus.description}</p>
-    <a class="edition-status__link" href={withBase("/")}>
-      {ui.editionStatus.backToEnglish}
-    </a>
-  </article>
+  <HeroSection
+    exploreWorkLabel={ui.cta.exploreWork}
+    readResearchLabel={ui.cta.readResearch}
+    lang="zh"
+  />
+
+  <section
+    class="home-section site-frame"
+    data-home-section="current-research"
+    aria-labelledby="current-research-title"
+  >
+    <SectionHeader
+      id="current-research-title"
+      index="01"
+      label="研究索引"
+      title="当前研究"
+    />
+    <ResearchIndex entries={researchThemes} locale="zh" />
+  </section>
+
+  <section
+    class="home-section home-section--work site-frame"
+    data-home-section="selected-work"
+    aria-labelledby="selected-work-title"
+  >
+    <SectionHeader
+      id="selected-work-title"
+      index="02"
+      label="项目案例"
+      title="精选作品"
+    />
+    <div class="selected-work">
+      {
+        selectedWork.map((entry, index) => (
+          <ProjectFeature
+            entry={entry}
+            index={index}
+            linkLabel={ui.cta.viewProject}
+            locale="zh"
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <section
+    class="home-section site-frame"
+    data-home-section="latest-research"
+    aria-labelledby="latest-research-title"
+  >
+    <SectionHeader
+      id="latest-research-title"
+      index="03"
+      label="发布内容"
+      title="最新研究"
+    />
+    <ol class="latest-research">
+      {
+        latestResearch.map((entry) => (
+          <ArticleListItem entry={entry} locale="zh" />
+        ))
+      }
+    </ol>
+  </section>
+
+  <section
+    class="home-section home-section--status site-frame"
+    data-home-section="lab-status"
+    aria-labelledby="lab-status-title"
+  >
+    <SectionHeader
+      id="lab-status-title"
+      index="04"
+      label="正在构建"
+      title="实验室动态"
+    />
+    <LabStatus entries={visibleWork} locale="zh" />
+  </section>
 </BaseLayout>
 
 <style>
-  .edition-status {
-    display: grid;
-    align-content: center;
-    gap: 1.5rem;
-    min-height: 62svh;
-    max-width: var(--reading-width);
-    padding-block: clamp(5rem, 12vw, 10rem);
+  .home-section {
+    padding-block-start: clamp(5rem, 12vw, 10rem);
   }
 
-  .edition-status > p,
-  .edition-status > h1 {
+  .home-section--work {
+    width: min(100% - (2 * var(--page-gutter)), 92rem);
+  }
+
+  .latest-research {
+    padding: 0;
     margin: 0;
+    list-style: none;
   }
 
-  .edition-status__link {
-    width: fit-content;
-    min-height: 2.75rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--color-border);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: var(--font-size-xs);
-    letter-spacing: 0.04em;
-    text-decoration: none;
+  .home-section--status {
+    padding-block-end: clamp(1rem, 3vw, 2rem);
   }
 
-  .edition-status__link:hover {
-    border-color: var(--color-accent);
+  .home-section--status :global(.section-header) {
+    margin-block-end: clamp(2rem, 5vw, 3.5rem);
   }
 </style>

@@ -1,6 +1,18 @@
+---
+import type { Locale } from "../../config/site";
+import { getUi } from "../../i18n";
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = "en" } = Astro.props;
+const ui = getUi(locale);
+---
+
 <a class="back-to-top" href="#top">
   <span aria-hidden="true">↑</span>
-  Back to top
+  {ui.accessibility.backToTop}
 </a>
 
 <style>

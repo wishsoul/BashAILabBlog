@@ -4,7 +4,9 @@ import TableOfContents from "../components/content/TableOfContents.astro";
 import TagList from "../components/content/TagList.astro";
 import BackToTop from "../components/layout/BackToTop.astro";
 import Breadcrumb from "../components/layout/Breadcrumb.astro";
-import { contentSlug } from "../lib/content";
+import { getUi } from "../i18n";
+import { displayContentLabel } from "../lib/content-labels";
+import { contentPath, localizedPath } from "../lib/localized-content";
 import { buildArticleJsonLd, DEFAULT_OG_IMAGE } from "../lib/seo";
 import BaseLayout from "./BaseLayout.astro";
 
@@ -18,21 +20,23 @@ interface Props {
   entry: CollectionEntry<"research">;
   headings: Heading[];
   minutes: number;
+  translationPath?: string;
 }
 
-const { entry, headings, minutes } = Astro.props;
-const slug = contentSlug(entry.id);
+const { entry, headings, minutes, translationPath } = Astro.props;
+const locale = entry.data.lang;
+const ui = getUi(locale);
 const publishedAt = entry.data.publishedAt;
 const publicationDate = publishedAt?.toISOString().slice(0, 10);
 const publicationLabel = publishedAt
-  ? new Intl.DateTimeFormat("en", {
+  ? new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en", {
       day: "2-digit",
       month: "short",
       year: "numeric",
       timeZone: "UTC",
     }).format(publishedAt)
   : undefined;
-const canonicalPath = `/research/${slug}/`;
+const canonicalPath = contentPath(locale, "research", entry.id);
 const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 ---
 
@@ -41,6 +45,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
   description={entry.data.seo.description}
   lang={entry.data.lang}
   canonicalPath={canonicalPath}
+  translationPath={translationPath}
   image={image}
   openGraphType="article"
   jsonLd={buildArticleJsonLd({
@@ -54,16 +59,18 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 >
   <article id="top" class="site-frame content-layout">
     <Breadcrumb
+      locale={locale}
       items={[
-        { label: "Home", href: "/" },
-        { label: "Research", href: "/research/" },
+        { label: ui.breadcrumb.home, href: localizedPath(locale, "/") },
+        { label: ui.nav.research, href: localizedPath(locale, "/research/") },
         { label: entry.data.title },
       ]}
     />
 
     <header class="content-layout__header">
       <p class="meta-label">
-        {entry.data.category} / {entry.data.status}
+        {displayContentLabel(locale, entry.data.category)} /
+        {displayContentLabel(locale, entry.data.status)}
       </p>
       <h1>{entry.data.title}</h1>
       <p class="lead">{entry.data.description}</p>
@@ -71,7 +78,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 
     <section
       class="content-layout__metadata"
-      aria-label="Publication details"
+      aria-label={ui.metadata.publicationDetails}
       data-publication-metadata
     >
       {
@@ -79,15 +86,18 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
           <time datetime={publicationDate}>{publicationLabel}</time>
         )
       }
-      <span>{entry.data.category}</span>
-      <span>{entry.data.status}</span>
-      <span>{minutes} min read</span>
-      <TagList tags={entry.data.tags} label={`${entry.data.title} tags`} />
+      <span>{displayContentLabel(locale, entry.data.category)}</span>
+      <span>{displayContentLabel(locale, entry.data.status)}</span>
+      <span>{minutes} {ui.metadata.minutesRead}</span>
+      <TagList
+        tags={entry.data.tags}
+        label={ui.metadata.tags(entry.data.title)}
+      />
     </section>
 
     <div class="content-layout__body">
       <aside class="content-layout__rail">
-        <TableOfContents headings={headings} />
+        <TableOfContents headings={headings} locale={locale} />
       </aside>
       <div class="content-layout__prose" data-content-prose>
         <slot />
@@ -95,7 +105,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
     </div>
 
     <footer class="content-layout__footer">
-      <BackToTop />
+      <BackToTop locale={locale} />
     </footer>
   </article>
 </BaseLayout>

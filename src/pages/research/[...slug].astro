@@ -12,6 +12,7 @@ import {
   estimateReadingMinutes,
   visibleEntries,
 } from "../../lib/content";
+import { translationPath } from "../../lib/localized-content";
 
 export async function getStaticPaths() {
   const entries = await getCollection("research");
@@ -19,15 +20,19 @@ export async function getStaticPaths() {
     .filter((entry) => entry.data.lang === "en")
     .map((entry) => ({
       params: { slug: contentSlug(entry.id) },
-      props: { entry },
+      props: {
+        entry,
+        translationPath: translationPath(entries, entry, "research"),
+      },
     }));
 }
 
 interface Props {
   entry: CollectionEntry<"research">;
+  translationPath?: string;
 }
 
-const { entry } = Astro.props;
+const { entry, translationPath: counterpartPath } = Astro.props;
 const { Content, headings } = await render(entry);
 const sourceText =
   "body" in entry && typeof entry.body === "string"
@@ -44,6 +49,11 @@ const mdxComponents = {
 };
 ---
 
-<ContentLayout entry={entry} headings={headings} minutes={minutes}>
+<ContentLayout
+  entry={entry}
+  headings={headings}
+  minutes={minutes}
+  translationPath={counterpartPath}
+>
   <Content components={mdxComponents} />
 </ContentLayout>

@@ -7,19 +7,23 @@ import BackToTop from "../components/layout/BackToTop.astro";
 import Breadcrumb from "../components/layout/Breadcrumb.astro";
 import ProjectMetadata from "../components/work/ProjectMetadata.astro";
 import StatusIndicator from "../components/work/StatusIndicator.astro";
-import { contentSlug } from "../lib/content";
+import { getUi } from "../i18n";
+import { displayContentLabel } from "../lib/content-labels";
+import { contentPath, localizedPath } from "../lib/localized-content";
 import { buildWorkJsonLd, DEFAULT_OG_IMAGE } from "../lib/seo";
 import BaseLayout from "./BaseLayout.astro";
 
 interface Props {
   entry: CollectionEntry<"work">;
+  translationPath?: string;
 }
 
-const { entry } = Astro.props;
-const slug = contentSlug(entry.id);
+const { entry, translationPath } = Astro.props;
+const locale = entry.data.lang;
+const ui = getUi(locale);
 const projectNumber = String(entry.data.order).padStart(2, "0");
 const hasActions = Boolean(entry.data.github || entry.data.demo);
-const canonicalPath = `/work/${slug}/`;
+const canonicalPath = contentPath(locale, "work", entry.id);
 const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 ---
 
@@ -28,6 +32,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
   description={entry.data.seo.description}
   lang={entry.data.lang}
   canonicalPath={canonicalPath}
+  translationPath={translationPath}
   image={image}
   jsonLd={buildWorkJsonLd({
     title: entry.data.title,
@@ -40,9 +45,10 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
 >
   <article id="top" class="site-frame project-layout">
     <Breadcrumb
+      locale={locale}
       items={[
-        { label: "Home", href: "/" },
-        { label: "Work", href: "/work/" },
+        { label: ui.breadcrumb.home, href: localizedPath(locale, "/") },
+        { label: ui.nav.work, href: localizedPath(locale, "/work/") },
         { label: entry.data.title },
       ]}
     />
@@ -51,13 +57,16 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
       <div class="project-layout__identity">
         <div class="project-layout__eyebrow">
           <p class="meta-label">
-            {projectNumber} / {entry.data.category}
+            {projectNumber} / {displayContentLabel(locale, entry.data.category)}
           </p>
-          <StatusIndicator status={entry.data.status} />
+          <StatusIndicator status={entry.data.status} locale={locale} />
         </div>
         <h1>{entry.data.title}</h1>
         <p class="lead">{entry.data.description}</p>
-        <TagList tags={entry.data.tags} label={`${entry.data.title} tags`} />
+        <TagList
+          tags={entry.data.tags}
+          label={ui.metadata.tags(entry.data.title)}
+        />
       </div>
 
       <div class="project-layout__visual">
@@ -75,7 +84,8 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
               <span>{projectNumber}</span>
               <strong>{entry.data.title}</strong>
               <p>
-                {entry.data.platform} / {entry.data.category}
+                {displayContentLabel(locale, entry.data.platform)} /
+                {displayContentLabel(locale, entry.data.category)}
               </p>
             </div>
           )
@@ -83,16 +93,29 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
       </div>
     </header>
 
-    <section class="project-layout__facts" aria-label="Project information">
-      <ProjectMetadata entry={entry} />
+    <section
+      class="project-layout__facts"
+      aria-label={ui.metadata.projectInformation}
+    >
+      <ProjectMetadata entry={entry} locale={locale} />
       {
         hasActions && (
           <div class="project-layout__actions" data-project-actions>
             {entry.data.github && (
-              <ExternalLink href={entry.data.github}>GitHub</ExternalLink>
+              <ExternalLink
+                href={entry.data.github}
+                newWindowLabel={ui.common.opensNewTab}
+              >
+                GitHub
+              </ExternalLink>
             )}
             {entry.data.demo && (
-              <ExternalLink href={entry.data.demo}>Demo</ExternalLink>
+              <ExternalLink
+                href={entry.data.demo}
+                newWindowLabel={ui.common.opensNewTab}
+              >
+                {ui.project.demo}
+              </ExternalLink>
             )}
           </div>
         )
@@ -102,7 +125,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
     <div class="project-layout__body">
       <aside class="project-layout__rail" aria-hidden="true">
         <span>{projectNumber}</span>
-        <span>Case study</span>
+        <span>{ui.project.caseStudy}</span>
       </aside>
       <div class="project-case-study" data-project-case-study>
         <slot />
@@ -110,7 +133,7 @@ const image = entry.data.seo.image?.src ?? DEFAULT_OG_IMAGE;
     </div>
 
     <footer class="project-layout__footer">
-      <BackToTop />
+      <BackToTop locale={locale} />
     </footer>
   </article>
 </BaseLayout>

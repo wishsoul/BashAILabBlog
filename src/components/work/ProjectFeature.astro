@@ -1,7 +1,10 @@
 ---
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
-import { contentSlug } from "../../lib/content";
+import type { Locale } from "../../config/site";
+import { getUi } from "../../i18n";
+import { displayContentLabel } from "../../lib/content-labels";
+import { contentPath } from "../../lib/localized-content";
 import { withBase } from "../../lib/urls";
 import TagList from "../content/TagList.astro";
 import StatusIndicator from "./StatusIndicator.astro";
@@ -10,12 +13,14 @@ interface Props {
   entry: CollectionEntry<"work">;
   index: number;
   linkLabel: string;
+  locale: Locale;
 }
 
-const { entry, index, linkLabel } = Astro.props;
+const { entry, index, linkLabel, locale } = Astro.props;
+const ui = getUi(locale);
 const number = String(index + 1).padStart(2, "0");
 const isReversed = index % 2 === 1;
-const href = withBase(`/work/${contentSlug(entry.id)}/`);
+const href = withBase(contentPath(locale, "work", entry.id));
 ---
 
 <article
@@ -25,17 +30,26 @@ const href = withBase(`/work/${contentSlug(entry.id)}/`);
 >
   <div class="project-feature__content">
     <div class="project-feature__heading">
-      <p class="project-feature__number meta-label">{number} / Featured Work</p>
-      <StatusIndicator status={entry.data.status} />
+      <p class="project-feature__number meta-label">
+        {number} / {ui.project.featuredWork}
+      </p>
+      <StatusIndicator status={entry.data.status} locale={locale} />
     </div>
 
     <div class="project-feature__title flow">
-      <p class="meta-label">{entry.data.category} / {entry.data.platform}</p>
+      <p class="meta-label">
+        {displayContentLabel(locale, entry.data.category)} / {
+          displayContentLabel(locale, entry.data.platform)
+        }
+      </p>
       <h3 data-project-title>{entry.data.title}</h3>
       <p>{entry.data.description}</p>
     </div>
 
-    <TagList tags={entry.data.tags} label={`${entry.data.title} tags`} />
+    <TagList
+      tags={entry.data.tags}
+      label={ui.metadata.tags(entry.data.title)}
+    />
 
     <a class="project-feature__link" href={href}>
       {linkLabel}<span aria-hidden="true">↗</span>
@@ -56,13 +70,13 @@ const href = withBase(`/work/${contentSlug(entry.id)}/`);
         <div class="project-cover" data-typographic-cover aria-hidden="true">
           <div class="project-cover__topline">
             <span>{number}</span>
-            <span>{entry.data.status}</span>
+            <span>{displayContentLabel(locale, entry.data.status)}</span>
           </div>
-          <p>{entry.data.category}</p>
+          <p>{displayContentLabel(locale, entry.data.category)}</p>
           <strong>{entry.data.title}</strong>
           <div class="project-cover__baseline">
-            <span>{entry.data.platform}</span>
-            <span>Bash AI Lab</span>
+            <span>{displayContentLabel(locale, entry.data.platform)}</span>
+            <span>{ui.brand}</span>
           </div>
         </div>
       )

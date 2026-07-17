@@ -1,0 +1,83 @@
+---
+import { getCollection } from "astro:content";
+import ProjectListItem from "../../../components/work/ProjectListItem.astro";
+import WorkFilter from "../../../components/work/WorkFilter.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { sortByOrderThenDate, visibleEntries } from "../../../lib/content";
+
+const allWork = await getCollection("work");
+const projects = sortByOrderThenDate(
+  visibleEntries(
+    allWork.filter((entry) => entry.data.lang === "zh"),
+    import.meta.env.PROD,
+  ),
+);
+const categories = [...new Set(projects.map((entry) => entry.data.category))];
+---
+
+<BaseLayout
+  title="作品"
+  description="Bash AI 实验室的独立产品、界面基础设施与实验。"
+  lang="zh"
+  canonicalPath="/zh/work/"
+  translationPath="/work/"
+>
+  <div class="site-frame work-archive">
+    <header class="work-archive__header">
+      <p class="meta-label">独立软件 / 系统 / 实验</p>
+      <h1 class="display-title">作品</h1>
+      <p class="lead">通过研究、约束设计与亲自实现构建的产品和技术系统。</p>
+    </header>
+
+    <WorkFilter categories={categories} locale="zh" />
+
+    <section class="work-archive__projects" aria-label="项目归档">
+      {
+        projects.map((entry, index) => (
+          <ProjectListItem entry={entry} index={index} locale="zh" />
+        ))
+      }
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .work-archive {
+    padding-block: clamp(4rem, 9vw, 8rem) clamp(5rem, 10vw, 9rem);
+  }
+
+  .work-archive__header {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(18rem, 1.15fr);
+    gap: 1rem clamp(2rem, 8vw, 8rem);
+    align-items: end;
+    padding-block-end: clamp(3rem, 7vw, 6rem);
+  }
+
+  .work-archive__header > .meta-label {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+
+  .work-archive__header h1 {
+    align-self: end;
+  }
+
+  .work-archive__header .lead {
+    margin: 0;
+  }
+
+  .work-archive__projects {
+    display: block;
+  }
+
+  @media (max-width: 46rem) {
+    .work-archive__header {
+      grid-template-columns: 1fr;
+    }
+
+    .work-archive__header > .meta-label {
+      grid-column: 1;
+    }
+  }
+</style>
