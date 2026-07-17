@@ -97,6 +97,27 @@ test("renders the content-driven homepage in the approved editorial sequence", a
   await expect(page.getByRole("region", { name: /card grid/i })).toHaveCount(0);
 });
 
+test("exposes hero entrance groups in editorial order without reduced-motion transforms", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("./");
+
+  const heroGroups = page.locator(
+    '[data-home-section="hero"] [data-hero-motion-group]',
+  );
+  expect(
+    await heroGroups.evaluateAll((groups) =>
+      groups.map((group) => group.getAttribute("data-hero-motion-group")),
+    ),
+  ).toEqual(["heading", "context", "footer"]);
+  expect(
+    await heroGroups.evaluateAll((groups) =>
+      groups.map((group) => getComputedStyle(group).transform),
+    ),
+  ).toEqual(["none", "none", "none"]);
+});
+
 test("keeps every meaningful visible label at the approved readable scale", async ({
   page,
 }) => {

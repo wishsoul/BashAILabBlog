@@ -13,6 +13,9 @@ test("does not introduce horizontal overflow at the 320px viewport", async ({
 }) => {
   await page.setViewportSize({ width: 320, height: 844 });
   await page.goto("./");
+  await page.evaluate(() =>
+    new Promise<void>((resolve) => requestAnimationFrame(() => resolve())),
+  );
 
   const viewport = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,

@@ -115,11 +115,13 @@ const href = withBase(contentPath(locale, "research", entry.id));
   .article-item__arrow {
     color: var(--color-accent);
     font-size: var(--font-size-sm);
-    transition: transform 160ms ease;
+    transition: transform var(--duration-fast) var(--ease-out);
   }
 
-  .article-item h3 a:hover .article-item__arrow {
-    transform: translate(0.15rem, -0.15rem);
+  @media (hover: hover) and (pointer: fine) {
+    .article-item h3 a:hover .article-item__arrow {
+      transform: translate(0.15rem, -0.15rem);
+    }
   }
 
   @media (max-width: 39.999rem) {

@@ -107,8 +107,8 @@ const isCurrent = (href: string) => {
     border-block-end: 1px solid transparent;
     background: transparent;
     transition:
-      background-color 160ms ease,
-      border-color 160ms ease;
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
   }
 
   .site-header[data-scrolled="true"] {

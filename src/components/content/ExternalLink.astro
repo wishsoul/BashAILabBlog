@@ -31,10 +31,12 @@ const {
     display: inline-block;
     margin-inline-start: 0.18em;
     color: var(--color-accent);
-    transition: transform 160ms ease;
+    transition: transform var(--duration-fast) var(--ease-out);
   }
 
-  .external-link:hover .external-link__arrow {
-    transform: translate(0.1em, -0.1em);
+  @media (hover: hover) and (pointer: fine) {
+    .external-link:hover .external-link__arrow {
+      transform: translate(0.1em, -0.1em);
+    }
   }
 </style>
