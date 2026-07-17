@@ -158,6 +158,30 @@ test("theme toggle reflects the system preference when no choice is stored", asy
   ).toBeVisible();
 });
 
+test("theme reduced motion skips the View Transition API", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.addInitScript(() => {
+    localStorage.removeItem("theme");
+    Object.defineProperty(document, "startViewTransition", {
+      configurable: true,
+      value: () => {
+        document.documentElement.dataset.unexpectedViewTransition = "true";
+      },
+    });
+  });
+  await page.goto("./");
+
+  const toggle = page.locator("[data-theme-toggle]");
+  await toggle.click();
+
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(toggle).toHaveAccessibleName("Use light theme");
+  expect(await page.evaluate(() => localStorage.theme)).toBe("dark");
+  await expect(page.locator("html")).not.toHaveAttribute(
+    "data-unexpected-view-transition",
+  );
+});
+
 for (const viewTransitionMode of ["native", "fallback"] as const) {
   test(`rapid theme clicks leave the last choice consistent with the ${viewTransitionMode} path`, async ({
     page,

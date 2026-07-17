@@ -151,6 +151,61 @@ test("filter projects expose unique stable transition names", async ({
   ).toEqual(transitionNames);
 });
 
+test("scopes project transition names to direct filter captures", async ({
+  page,
+}) => {
+  await page.goto("./work/");
+
+  const projectItems = page.locator("[data-project-list-item]");
+  const inlineTransitionNames = () =>
+    projectItems.evaluateAll((items) =>
+      items.map((item) => (item as HTMLElement).style.viewTransitionName),
+    );
+
+  expect(await inlineTransitionNames()).toEqual(projects.map(() => ""));
+
+  await page.evaluate(() => {
+    Object.defineProperty(document, "startViewTransition", {
+      configurable: true,
+      value: (update: () => void) => {
+        const capturedNames = [
+          ...document.querySelectorAll<HTMLElement>("[data-project-list-item]"),
+        ].map((item) => item.style.viewTransitionName);
+        document.documentElement.dataset.capturedProjectTransitionNames =
+          JSON.stringify(capturedNames);
+        const updateCallbackDone = Promise.resolve().then(update);
+        return {
+          finished: updateCallbackDone,
+          ready: Promise.resolve(),
+          skipTransition() {},
+          updateCallbackDone,
+        };
+      },
+    });
+  });
+
+  await page.getByRole("button", { name: "Products" }).click();
+
+  const stableNames = await projectItems.evaluateAll((items) =>
+    items.map((item) => item.getAttribute("data-project-transition-name")),
+  );
+  expect(
+    await page
+      .locator("html")
+      .getAttribute("data-captured-project-transition-names"),
+  ).toBe(JSON.stringify(stableNames));
+  await expect.poll(inlineTransitionNames).toEqual(projects.map(() => ""));
+
+  await page.locator("[data-theme-toggle]").click();
+
+  expect(
+    await page
+      .locator("html")
+      .getAttribute("data-captured-project-transition-names"),
+  ).toBe(JSON.stringify(projects.map(() => "")));
+  expect(await inlineTransitionNames()).toEqual(projects.map(() => ""));
+});
+
 test("filter fallback works without the View Transition API", async ({
   page,
 }) => {
@@ -168,6 +223,31 @@ test("filter fallback works without the View Transition API", async ({
   await expect(products).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("[data-project-list-item]:visible")).toHaveCount(3);
   await expect(page).toHaveURL(/\?category=Products$/u);
+});
+
+test("filter reduced motion skips the View Transition API", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addInitScript(() => {
+    Object.defineProperty(document, "startViewTransition", {
+      configurable: true,
+      value: () => {
+        document.documentElement.dataset.unexpectedViewTransition = "true";
+      },
+    });
+  });
+  await page.goto("./work/");
+
+  const products = page.getByRole("button", { name: "Products" });
+  await products.click();
+
+  await expect(products).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("[data-project-list-item]:visible")).toHaveCount(3);
+  await expect(page).toHaveURL(/\?category=Products$/u);
+  await expect(page.locator("html")).not.toHaveAttribute(
+    "data-unexpected-view-transition",
+  );
 });
 
 test.describe("without JavaScript", () => {

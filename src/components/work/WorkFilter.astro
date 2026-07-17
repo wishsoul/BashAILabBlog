@@ -56,9 +56,17 @@ const filters = ["All", ...categories];
   let requestedFilter = "All";
   let filterRequestVersion = 0;
 
-  for (const item of projectItems) {
-    const transitionName = item.dataset.projectTransitionName;
-    if (transitionName) item.style.viewTransitionName = transitionName;
+  function setProjectTransitionNames() {
+    for (const item of projectItems) {
+      const transitionName = item.dataset.projectTransitionName;
+      if (transitionName) item.style.viewTransitionName = transitionName;
+    }
+  }
+
+  function clearProjectTransitionNames() {
+    for (const item of projectItems) {
+      item.style.removeProperty("view-transition-name");
+    }
   }
 
   function filterFromUrl() {
@@ -109,12 +117,14 @@ const filters = ["All", ...categories];
       activeFilterTransition?.skipTransition();
       activeFilterTransition = undefined;
       delete document.documentElement.dataset.workFilterTransition;
+      clearProjectTransitionNames();
       updateFilter(filter, shouldPersist);
       return;
     }
 
     if (shouldPersist) persistFilter(filter);
     activeFilterTransition?.skipTransition();
+    setProjectTransitionNames();
     document.documentElement.dataset.workFilterTransition = "true";
     const transition = document.startViewTransition(() => {
       if (requestVersion !== filterRequestVersion) return;
@@ -126,6 +136,7 @@ const filters = ["All", ...categories];
       .finally(() => {
         if (activeFilterTransition !== transition) return;
         delete document.documentElement.dataset.workFilterTransition;
+        clearProjectTransitionNames();
         activeFilterTransition = undefined;
       });
   }
