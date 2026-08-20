@@ -46,6 +46,9 @@ html:lang(zh) .prose {
   font-size: inherit;
   line-height: inherit;
 }
+.prose :where(p, li, a) {
+  overflow-wrap: anywhere;
+}
 .prose > :where(p + p),
 .prose :where(blockquote:not([class]) p + p) {
   margin-block-start: 1.4em;

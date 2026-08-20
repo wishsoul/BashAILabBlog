@@ -123,6 +123,32 @@ test("mobile navigation closes on Escape and restores focus", async ({
   await expect(trigger).toBeFocused();
 });
 
+test("mobile navigation contains focus and makes page content inert while open", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("./");
+
+  const trigger = page.getByRole("button", { name: "Menu" });
+  const mobileNavigation = page.getByRole("navigation", { name: "Mobile" });
+  const workLink = mobileNavigation.getByRole("link", { name: "Work" });
+
+  await trigger.click();
+  await expect(workLink).toBeFocused();
+  await expect(page.locator("main")).toHaveJSProperty("inert", true);
+  await expect(page.locator("footer")).toHaveJSProperty("inert", true);
+
+  await page.keyboard.press("Shift+Tab");
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(workLink).toBeFocused();
+
+  await page.keyboard.press("Escape");
+  await expect(page.locator("main")).toHaveJSProperty("inert", false);
+  await expect(page.locator("footer")).toHaveJSProperty("inert", false);
+  await expect(trigger).toBeFocused();
+});
+
 test("theme choice updates its accessible label and persists after reload", async ({
   page,
 }) => {

@@ -27,24 +27,46 @@ const items = headings
 
 {
   items.length > 0 && (
-    <nav
-      class="table-of-contents"
-      aria-label={ui.accessibility.tableOfContents}
-    >
-      <p class="meta-label">{ui.accessibility.onThisPage}</p>
-      <ol>
-        {items.map((heading) => (
-          <li
-            class:list={{ "table-of-contents__subitem": heading.depth === 3 }}
-          >
-            <span class="table-of-contents__index" aria-hidden="true">
-              {heading.index ?? ""}
-            </span>
-            <a href={`#${heading.slug}`}>{heading.text}</a>
-          </li>
-        ))}
-      </ol>
-    </nav>
+    <>
+      <nav
+        class="table-of-contents table-of-contents--desktop"
+        aria-label={ui.accessibility.tableOfContents}
+      >
+        <p class="meta-label">{ui.accessibility.onThisPage}</p>
+        <ol>
+          {items.map((heading) => (
+            <li
+              class:list={{ "table-of-contents__subitem": heading.depth === 3 }}
+            >
+              <span class="table-of-contents__index" aria-hidden="true">
+                {heading.index ?? ""}
+              </span>
+              <a href={`#${heading.slug}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <details class="table-of-contents table-of-contents--mobile">
+        <summary class="meta-label">{ui.accessibility.onThisPage}</summary>
+        <nav aria-label={ui.accessibility.tableOfContents}>
+          <ol>
+            {items.map((heading) => (
+              <li
+                class:list={{
+                  "table-of-contents__subitem": heading.depth === 3,
+                }}
+              >
+                <span class="table-of-contents__index" aria-hidden="true">
+                  {heading.index ?? ""}
+                </span>
+                <a href={`#${heading.slug}`}>{heading.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </details>
+    </>
   )
 }
 
@@ -56,6 +78,10 @@ const items = headings
 
   .table-of-contents > p {
     margin: 0 0 0.85rem;
+  }
+
+  .table-of-contents--mobile {
+    display: none;
   }
 
   .table-of-contents ol {
@@ -98,5 +124,51 @@ const items = headings
 
   .table-of-contents__subitem .table-of-contents__index::before {
     content: "—";
+  }
+
+  @media (max-width: 64rem) {
+    .table-of-contents--desktop {
+      display: none;
+    }
+
+    .table-of-contents--mobile {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 1px solid var(--color-border);
+    }
+
+    .table-of-contents--mobile summary {
+      display: flex;
+      min-height: 2.75rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .table-of-contents--mobile summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .table-of-contents--mobile summary::after {
+      color: var(--color-accent);
+      content: "+";
+      font-size: var(--font-size-sm);
+    }
+
+    .table-of-contents--mobile[open] summary::after {
+      content: "−";
+    }
+
+    .table-of-contents--mobile nav {
+      padding: 0 1rem 1rem;
+      border-block-start: 1px solid var(--color-border);
+    }
+
+    .table-of-contents--mobile ol {
+      padding-block-start: 1rem;
+    }
   }
 </style>

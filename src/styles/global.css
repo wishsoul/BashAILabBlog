@@ -9,14 +9,14 @@
   --color-text-secondary: #686868;
   --color-reading-text: #282826;
   --color-border: rgb(0 0 0 / 10%);
-  --color-accent: #5b5cff;
+  --color-accent: #5152ee;
   --font-sans: "Geist Variable", system-ui, sans-serif;
   --font-cjk:
     "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, monospace;
   --font-size-3xs: 0.395625rem;
   --font-size-2xs: 0.5275rem;
-  --font-size-xs: 0.703125rem;
+  --font-size-xs: 0.75rem;
   --font-size-sm: 0.9375rem;
   --font-size-md: 1.25rem;
   --font-size-lg: 1.665625rem;
