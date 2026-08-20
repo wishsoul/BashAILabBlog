@@ -46,7 +46,7 @@ try {
             bottom: 78px;
             width: 238px;
             height: 238px;
-            border: 1px solid #5B5CFF;
+            border: 1px solid #5152EE;
             border-radius: 50%;
           }
           .orbit {
@@ -55,7 +55,7 @@ try {
             bottom: 156px;
             width: 356px;
             height: 1px;
-            background: #5B5CFF;
+            background: #5152EE;
             transform: rotate(-31deg);
             transform-origin: right center;
           }
@@ -75,7 +75,7 @@ try {
             letter-spacing: -0.085em;
             line-height: 0.83;
           }
-          h1 span { color: #5B5CFF; }
+          h1 span { color: #5152EE; }
           .footer { display: flex; justify-content: space-between; gap: 24px; }
         </style>
       </head>
