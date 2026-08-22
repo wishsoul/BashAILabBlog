@@ -87,6 +87,17 @@ const isCurrent = (href: string) => {
   const visibleLabel = navigation?.querySelector<HTMLElement>(
     "[data-mobile-navigation-label]",
   );
+  const panelLinks = [
+    ...(panel?.querySelectorAll<HTMLAnchorElement>("a") ?? []),
+  ];
+  const inertTargets = [
+    document.querySelector<HTMLElement>("main"),
+    document.querySelector<HTMLElement>("footer"),
+    document.querySelector<HTMLElement>(".site-header__brand"),
+    document.querySelector<HTMLElement>(".language-switch"),
+    document.querySelector<HTMLElement>(".theme-toggle"),
+    document.querySelector<HTMLElement>(".site-header__desktop-navigation"),
+  ].filter((target): target is HTMLElement => target !== null);
 
   function setOpen(open: boolean, restoreFocus = false) {
     if (!trigger || !panel || !visibleLabel) return;
@@ -94,13 +105,18 @@ const isCurrent = (href: string) => {
     const label = open ? trigger.dataset.closeLabel : trigger.dataset.menuLabel;
     trigger.setAttribute("aria-expanded", String(open));
     panel.hidden = !open;
+    for (const target of inertTargets) target.inert = open;
 
     if (label) {
       trigger.setAttribute("aria-label", label);
       visibleLabel.textContent = label;
     }
 
-    if (!open && restoreFocus) trigger.focus();
+    if (open) {
+      window.requestAnimationFrame(() => panelLinks[0]?.focus());
+    } else if (restoreFocus) {
+      trigger.focus();
+    }
   }
 
   trigger?.addEventListener("click", () => {
@@ -108,12 +124,28 @@ const isCurrent = (href: string) => {
   });
 
   document.addEventListener("keydown", (event) => {
-    if (
-      event.key !== "Escape" ||
-      trigger?.getAttribute("aria-expanded") !== "true"
-    )
+    if (trigger?.getAttribute("aria-expanded") !== "true") return;
+
+    if (event.key === "Escape") {
+      setOpen(false, true);
       return;
-    setOpen(false, true);
+    }
+
+    if (event.key !== "Tab" || panelLinks.length === 0) return;
+    const focusableControls = [trigger, ...panelLinks];
+    const currentIndex = focusableControls.indexOf(
+      document.activeElement as HTMLButtonElement | HTMLAnchorElement,
+    );
+    const nextIndex = event.shiftKey
+      ? currentIndex <= 0
+        ? focusableControls.length - 1
+        : currentIndex - 1
+      : currentIndex === focusableControls.length - 1
+        ? 0
+        : currentIndex + 1;
+
+    event.preventDefault();
+    focusableControls[nextIndex]?.focus();
   });
 
   panel?.addEventListener("click", (event) => {
@@ -139,7 +171,7 @@ const isCurrent = (href: string) => {
 
     .mobile-navigation__trigger {
       display: inline-flex;
-      min-height: 2.5rem;
+      min-height: 2.75rem;
       align-items: center;
       gap: 0.55rem;
       padding: 0;

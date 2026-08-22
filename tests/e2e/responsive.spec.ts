@@ -25,6 +25,18 @@ test("does not introduce horizontal overflow at the 320px viewport", async ({
   expect(viewport.scrollWidth).toBe(viewport.clientWidth);
 });
 
+test("wraps long prose URLs without overflowing at 320px", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.goto("./work/mac-native-kit/");
+
+  const viewport = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+
+  expect(viewport.scrollWidth).toBe(viewport.clientWidth);
+});
+
 test("keeps the homepage source and visual reading order aligned at 768px", async ({
   page,
 }) => {

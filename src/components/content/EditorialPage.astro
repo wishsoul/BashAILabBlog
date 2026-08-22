@@ -29,7 +29,7 @@ const canonicalPath = contentPath(locale, "pages", entry.id);
       <p class="lead">{entry.data.description}</p>
     </header>
 
-    <div class="editorial-page__content" data-page-content>
+    <div class="editorial-page__content prose" data-page-content>
       <slot />
     </div>
   </article>
@@ -49,42 +49,5 @@ const canonicalPath = contentPath(locale, "pages", entry.id);
 
   .editorial-page__header > p {
     margin: 0;
-  }
-
-  .editorial-page__content {
-    width: min(100%, var(--reading-width));
-  }
-
-  .editorial-page__content :global(h2) {
-    margin: clamp(3.5rem, 7vw, 6rem) 0 1.25rem;
-    padding-block-start: 1.25rem;
-    border-block-start: 1px solid var(--color-border);
-    font-size: var(--font-size-lg);
-    font-weight: 540;
-    letter-spacing: -0.035em;
-    line-height: 1.15;
-  }
-
-  .editorial-page__content :global(h2:first-child) {
-    margin-block-start: 0;
-  }
-
-  .editorial-page__content :global(p),
-  .editorial-page__content :global(li) {
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-md);
-    line-height: 1.65;
-  }
-
-  .editorial-page__content :global(p) {
-    margin: 0;
-  }
-
-  .editorial-page__content :global(p + p) {
-    margin-block-start: 1.5rem;
-  }
-
-  .editorial-page__content :global(ul) {
-    padding-inline-start: 1.25rem;
   }
 </style>

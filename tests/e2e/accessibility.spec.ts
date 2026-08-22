@@ -135,8 +135,8 @@ test("resolves reduced-motion styles and accessible contrast-critical tokens", a
   expect(contrastRatios["dark-text"]).toBeGreaterThanOrEqual(4.5);
   expect(contrastRatios["dark-secondary-text"]).toBeGreaterThanOrEqual(4.5);
   expect(contrastRatios["dark-reading-text"]).toBeGreaterThanOrEqual(4.5);
-  expect(contrastRatios["light-accent"]).toBeGreaterThanOrEqual(3);
-  expect(contrastRatios["dark-accent"]).toBeGreaterThanOrEqual(3);
+  expect(contrastRatios["light-accent"]).toBeGreaterThanOrEqual(4.5);
+  expect(contrastRatios["dark-accent"]).toBeGreaterThanOrEqual(4.5);
 });
 
 test("returns a long research page to its in-page top target", async ({

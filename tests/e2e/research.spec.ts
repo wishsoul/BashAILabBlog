@@ -143,6 +143,22 @@ test("reuses the shared prose system without flattening MDX callouts", async ({
   expect(widths.callout).toBeLessThanOrEqual(widths.prose);
 });
 
+test("collapses the table of contents on narrow screens", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("./research/from-l3-to-l4-agentic-development/");
+
+  const disclosure = page.locator(".table-of-contents--mobile");
+  const tableOfContents = disclosure.getByRole("navigation", {
+    name: "Table of contents",
+  });
+
+  await expect(disclosure).not.toHaveAttribute("open", "");
+  await expect(tableOfContents).toBeHidden();
+  await disclosure.getByText("On this page", { exact: true }).click();
+  await expect(disclosure).toHaveAttribute("open", "");
+  await expect(tableOfContents).toBeVisible();
+});
+
 test("renders a static constraint flow only for its research article", async ({
   page,
 }) => {

@@ -49,25 +49,25 @@ const ui = getUi(lang);
     }
   }
 
-  function applyTheme(theme: "light" | "dark", persist = false) {
+  function persistTheme(theme: "light" | "dark") {
+    try {
+      localStorage.theme = theme;
+    } catch {
+      // The visual choice still applies when storage is unavailable.
+    }
+  }
+
+  function applyTheme(theme: "light" | "dark") {
     root.dataset.theme = theme;
     document
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute("content", theme === "dark" ? "#0b0b0c" : "#f5f5f1");
 
-    if (persist) {
-      try {
-        localStorage.theme = theme;
-      } catch {
-        // The visual choice still applies when storage is unavailable.
-      }
-    }
-
     updateControls(theme);
   }
 
   const initialTheme = root.dataset.theme === "dark" ? "dark" : "light";
-  let requestedTheme = initialTheme;
+  let requestedTheme: "light" | "dark" = initialTheme;
   applyTheme(initialTheme);
 
   for (const toggle of toggles) {
@@ -75,18 +75,10 @@ const ui = getUi(lang);
       const nextTheme = requestedTheme === "dark" ? "light" : "dark";
       requestedTheme = nextTheme;
       const requestVersion = ++themeRequestVersion;
-      const bounds = toggle.getBoundingClientRect();
-      root.style.setProperty(
-        "--theme-transition-x",
-        `${bounds.left + bounds.width / 2}px`,
-      );
-      root.style.setProperty(
-        "--theme-transition-y",
-        `${bounds.top + bounds.height / 2}px`,
-      );
+      persistTheme(nextTheme);
 
       if (prefersReducedMotion.matches || !document.startViewTransition) {
-        applyTheme(nextTheme, true);
+        applyTheme(nextTheme);
         return;
       }
 
@@ -94,13 +86,14 @@ const ui = getUi(lang);
       root.dataset.themeTransition = "true";
       const transition = document.startViewTransition(() => {
         if (requestVersion !== themeRequestVersion) return;
-        applyTheme(nextTheme, true);
+        applyTheme(nextTheme);
       });
       activeThemeTransition = transition;
       void transition.finished
         .catch(() => {})
         .finally(() => {
           if (activeThemeTransition !== transition) return;
+          if (root.dataset.theme !== requestedTheme) applyTheme(requestedTheme);
           delete root.dataset.themeTransition;
           activeThemeTransition = undefined;
         });
@@ -111,8 +104,8 @@ const ui = getUi(lang);
 <style>
   .theme-toggle {
     display: inline-grid;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     padding: 0;
     border: 0;
     background: transparent;
@@ -140,7 +133,7 @@ const ui = getUi(lang);
     inset: 2px 2px 2px 50%;
     border-radius: 0 1rem 1rem 0;
     background: currentColor;
-    transition: transform var(--duration-fast) var(--ease-in-out);
+    transition: transform var(--duration-brand) var(--ease-in-out);
     transform-origin: left center;
   }
 
@@ -158,25 +151,30 @@ const ui = getUi(lang);
     pointer-events: none;
   }
 
+  :global(
+    html[data-theme-transition="true"]::view-transition-image-pair(root)
+  ) {
+    isolation: isolate;
+  }
+
   :global(html[data-theme-transition="true"]::view-transition-old(root)) {
     animation: none;
+    mix-blend-mode: normal;
   }
 
   :global(html[data-theme-transition="true"]::view-transition-new(root)) {
-    animation: theme-reveal var(--duration-brand) var(--ease-out);
+    animation: theme-crossfade var(--duration-brand) var(--ease-in-out) both;
+    mix-blend-mode: normal;
+    will-change: opacity;
   }
 
-  @keyframes theme-reveal {
+  @keyframes theme-crossfade {
     from {
-      clip-path: circle(
-        0 at var(--theme-transition-x) var(--theme-transition-y)
-      );
+      opacity: 0;
     }
 
     to {
-      clip-path: circle(
-        150vmax at var(--theme-transition-x) var(--theme-transition-y)
-      );
+      opacity: 1;
     }
   }
 
