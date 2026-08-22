@@ -67,7 +67,7 @@ const ui = getUi(lang);
   }
 
   const initialTheme = root.dataset.theme === "dark" ? "dark" : "light";
-  let requestedTheme = initialTheme;
+  let requestedTheme: "light" | "dark" = initialTheme;
   applyTheme(initialTheme);
 
   for (const toggle of toggles) {
