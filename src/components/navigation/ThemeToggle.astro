@@ -75,15 +75,6 @@ const ui = getUi(lang);
       const nextTheme = requestedTheme === "dark" ? "light" : "dark";
       requestedTheme = nextTheme;
       const requestVersion = ++themeRequestVersion;
-      const bounds = toggle.getBoundingClientRect();
-      root.style.setProperty(
-        "--theme-transition-x",
-        `${bounds.left + bounds.width / 2}px`,
-      );
-      root.style.setProperty(
-        "--theme-transition-y",
-        `${bounds.top + bounds.height / 2}px`,
-      );
 
       if (prefersReducedMotion.matches || !document.startViewTransition) {
         applyTheme(nextTheme, true);
@@ -140,7 +131,7 @@ const ui = getUi(lang);
     inset: 2px 2px 2px 50%;
     border-radius: 0 1rem 1rem 0;
     background: currentColor;
-    transition: transform var(--duration-fast) var(--ease-in-out);
+    transition: transform var(--duration-brand) var(--ease-in-out);
     transform-origin: left center;
   }
 
@@ -158,25 +149,30 @@ const ui = getUi(lang);
     pointer-events: none;
   }
 
+  :global(
+    html[data-theme-transition="true"]::view-transition-image-pair(root)
+  ) {
+    isolation: isolate;
+  }
+
   :global(html[data-theme-transition="true"]::view-transition-old(root)) {
     animation: none;
+    mix-blend-mode: normal;
   }
 
   :global(html[data-theme-transition="true"]::view-transition-new(root)) {
-    animation: theme-reveal var(--duration-brand) var(--ease-out);
+    animation: theme-crossfade var(--duration-brand) var(--ease-in-out) both;
+    mix-blend-mode: normal;
+    will-change: opacity;
   }
 
-  @keyframes theme-reveal {
+  @keyframes theme-crossfade {
     from {
-      clip-path: circle(
-        0 at var(--theme-transition-x) var(--theme-transition-y)
-      );
+      opacity: 0;
     }
 
     to {
-      clip-path: circle(
-        150vmax at var(--theme-transition-x) var(--theme-transition-y)
-      );
+      opacity: 1;
     }
   }
 

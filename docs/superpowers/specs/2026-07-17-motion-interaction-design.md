@@ -70,11 +70,10 @@ A new filter selection skips any active filter transition before applying the la
 
 The theme toggle keeps the existing theme attribute, accessible label, `localStorage` persistence, and `theme-color` update. When View Transitions are supported and reduced motion is not requested:
 
-- Read the toggle button's center point before changing the theme.
-- Store that point in temporary CSS custom properties on the root.
 - Apply the theme inside the View Transition update callback.
-- Reveal the new root snapshot with a circle expanding from the toggle over 260ms with `--ease-out`.
-- Animate the existing disc morph over 180ms with `--ease-in-out`.
+- Keep the outgoing root snapshot fully opaque while the new snapshot fades over it, preventing a transparent midpoint or brightness flash.
+- Crossfade the new root snapshot over 260ms with `--ease-in-out`, normal blending, and no moving high-contrast edge.
+- Animate the existing disc morph over the same 260ms with `--ease-in-out`.
 
 A rapid second toggle skips the active theme transition and starts from the current committed theme. Unsupported browsers and reduced-motion users receive the direct theme update.
 
